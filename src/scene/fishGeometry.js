@@ -3,38 +3,61 @@ import { Box3, Shape, ShapeGeometry, SphereGeometry, Vector3 } from 'three';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
 
-export function makeFishGeometry({ height = 0.3, width = 0.13 } = {}) {
-  const body = new SphereGeometry(0.5, 20, 12);
-  body.scale(1, height, width);
-  // perfil más afilado hacia la cola
+const smooth = (a, b, x) => {
+  const t = Math.min(1, Math.max(0, (x - a) / (b - a)));
+  return t * t * (3 - 2 * t);
+};
+
+function finGeometry(points) {
+  const s = new Shape();
+  s.moveTo(points[0][0], points[0][1]);
+  for (let i = 1; i < points.length; i++) s.lineTo(points[i][0], points[i][1]);
+  s.closePath();
+  return new ShapeGeometry(s);
+}
+
+/**
+ * Pez fusiforme tipo jurel: cuerpo comprimido, pedúnculo delgado, cola en horquilla,
+ * dos dorsales y anal. Mira a +X, largo ≈ 1, alto en Y, ancho en Z.
+ */
+export function makeFishGeometry({ height = 0.3, width = 0.12 } = {}) {
+  const body = new SphereGeometry(0.5, 28, 16);
+  body.scale(0.86, height, width);
+  body.translate(0.04, 0, 0);
   const p = body.attributes.position;
   for (let i = 0; i < p.count; i++) {
     const x = p.getX(i);
-    if (x < 0) {
-      const k = 1 + x * 0.9; // x=-0.5 → 0.55
-      p.setY(i, p.getY(i) * k);
-      p.setZ(i, p.getZ(i) * k);
-    }
+    const y = p.getY(i);
+    // pedúnculo caudal delgado y hocico algo más puntiagudo
+    const tail = 1 - 0.78 * smooth(0.0, -0.4, x);
+    const nose = 1 - 0.25 * smooth(0.3, 0.47, x);
+    // lomo más alto que el vientre
+    const k = tail * nose * (y > 0 ? 1.06 : 0.94);
+    p.setY(i, y * k);
+    p.setZ(i, p.getZ(i) * tail * nose);
   }
   body.computeVertexNormals();
 
-  const tailShape = new Shape();
-  tailShape.moveTo(-0.4, 0);
-  tailShape.lineTo(-0.74, height * 0.78);
-  tailShape.lineTo(-0.64, 0);
-  tailShape.lineTo(-0.74, -height * 0.78);
-  tailShape.closePath();
-  const tail = new ShapeGeometry(tailShape);
+  const h = height;
+  const parts = [
+    body,
+    // cola en horquilla
+    finGeometry([[-0.36, 0.035], [-0.6, h * 0.95], [-0.53, h * 0.12], [-0.47, 0], [-0.53, -h * 0.12], [-0.6, -h * 0.95], [-0.36, -0.035]]),
+    // primera dorsal (espinosa) y segunda dorsal (larga y baja)
+    finGeometry([[0.16, h * 0.44], [0.08, h * 0.95], [0.0, h * 0.5]]),
+    finGeometry([[-0.02, h * 0.46], [-0.08, h * 0.72], [-0.3, h * 0.2], [-0.3, h * 0.12]]),
+    // anal
+    finGeometry([[-0.04, -h * 0.4], [-0.1, -h * 0.62], [-0.3, -h * 0.16], [-0.3, -h * 0.1]]),
+  ];
+  // aletas pectorales, levemente abiertas
+  const pect = finGeometry([[0.2, -0.01], [0.06, -h * 0.35], [0.12, -0.02]]);
+  const pectL = pect.clone().rotateX(0.5).translate(0, 0, width * 0.42);
+  const pectR = pect.clone().rotateX(-0.5).translate(0, 0, -width * 0.42);
+  parts.push(pectL, pectR);
+  pect.dispose();
 
-  const finShape = new Shape();
-  finShape.moveTo(0.05, height * 0.42);
-  finShape.lineTo(-0.16, height * 0.85);
-  finShape.lineTo(-0.2, height * 0.4);
-  finShape.closePath();
-  const fin = new ShapeGeometry(finShape);
-
-  const merged = mergeGeometries([body.toNonIndexed(), tail.toNonIndexed(), fin.toNonIndexed()]);
-  body.dispose(); tail.dispose(); fin.dispose();
+  const merged = mergeGeometries(parts.map((g) => g.toNonIndexed()));
+  parts.forEach((g) => g.dispose());
   return merged;
 }
 

@@ -30,6 +30,8 @@
 }
 .water-shimmer { height: 42vh; }
 .water-shimmer video { opacity: 0.85; }
+/* con la escena 3D activa, el video de la portada se dibuja dentro de ella (SkyVideo) */
+.has-scene-sky .water-shimmer { display: none; }
 
 a.nav__brand { text-decoration: none; }
 

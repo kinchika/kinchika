@@ -2,6 +2,7 @@
 import { useState } from 'react';
 import { ALLIES, DIRECTIVAS, RESULTS } from '../data/kinchika.js';
 import { IconCamera, IconPin, IconWhatsApp } from '../components/Icons.jsx';
+import { CREDITS } from '../assets.config.js';
 
 // === RESULTS ===
 export function Results() {
@@ -226,6 +227,19 @@ export function Footer() {
           <span>· — Todos los derechos reservados</span>
           <span>33°26′S · 70°43′W · −100M</span>
         </div>
+        {CREDITS.length > 0 && (
+          <p className="footer-credits">
+            Modelos 3D:{' '}
+            {CREDITS.map((c, i) => (
+              <span key={c.url}>
+                {i > 0 && ' · '}
+                <a href={c.url} target="_blank" rel="noopener noreferrer">“{c.title}”</a> por {c.author}
+              </span>
+            ))}
+            {' '}— licencia <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener noreferrer">CC BY 4.0</a>.
+            Textura de roca: Poly Haven (CC0).
+          </p>
+        )}
       </div>
     </footer>
   );

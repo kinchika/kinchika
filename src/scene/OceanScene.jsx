@@ -15,6 +15,11 @@ import { FishSchool } from './FishSchool.jsx';
 import { Jellyfish } from './Jellyfish.jsx';
 import { BuoyLine } from './BuoyLine.jsx';
 import { ModelSlot } from './ModelSlot.jsx';
+import { WaterVolume } from './WaterVolume.jsx';
+import { Reef } from './Reef.jsx';
+import { SkyVideo } from './SkyVideo.jsx';
+import { Bloom, EffectComposer, ToneMapping, Vignette } from '@react-three/postprocessing';
+import { ToneMappingMode } from 'postprocessing';
 
 function CameraRig() {
   const { camera, scene } = useThree();
@@ -71,24 +76,28 @@ function World({ mobile }) {
   return (
     <>
       <CameraRig/>
+      <WaterVolume/>
       <Surface/>
+      <Reef mobile={mobile}/>
       <GodRays count={mobile ? 6 : 10}/>
       <MarineSnow count={Math.round(2400 * f)}/>
       <Bubbles count={Math.round(200 * f)}/>
+      <SkyVideo/>
       <BuoyLine/>
 
       {/* −6 m: anchovetas, rápidas y pequeñas */}
       <FishSchool count={Math.round(110 * f)} depthM={7} radius={46} speed={0.11} size={0.55}
         spread={[3.5, 1.4, 3]} lag={0.6} phase={1.2} dir={1}
-        color="#c8d6e0" modelUrl={FISH_MODELS.anchoveta}/>
+        color="#d4e0e8" back="#2e5566" modelUrl={FISH_MODELS.anchoveta}/>
       {/* −18 m: jurel, el cardumen principal */}
-      <FishSchool count={Math.round(80 * f)} depthM={19} radius={52} speed={0.06} size={1.25}
-        spread={[4.5, 2, 4]} lag={0.9} phase={-0.6} dir={-1} zCenter={-30}
-        color="#9fb4c4" emissive="#0b1d2a" modelUrl={FISH_MODELS.jurel}/>
+      <FishSchool count={Math.round(80 * f)} depthM={19} radius={44} speed={0.06} size={1.4}
+        spread={[4.5, 2, 4]} lag={0.9} phase={-0.6} dir={-1} zCenter={-26}
+        color="#b8c8d4" back="#223c4a" emissive="#06121a" metalness={0.8} roughness={0.28} modelUrl={FISH_MODELS.jurel}/>
       {/* −42 m: reinetas, pocas y grandes */}
       <FishSchool count={Math.round(16 * f) + 4} depthM={43} radius={40} speed={0.035} size={2.4}
         spread={[6, 2.5, 5]} lag={1.4} phase={2.4} dir={1} zCenter={-26}
-        color="#c9cfd6" emissive="#141c22" metalness={0.75} roughness={0.25} modelUrl={FISH_MODELS.reineta}/>
+        color="#d2d8de" back="#3a4652" emissive="#0c1218" metalness={0.85} roughness={0.22}
+        tint="#a9b9cc" modelUrl={FISH_MODELS.reineta}/>
 
       <Jellyfish count={mobile ? 6 : 10}/>
 
@@ -120,9 +129,21 @@ export default function OceanScene({ mobile }) {
         <Canvas
           dpr={[1, mobile ? 1.3 : 1.6]}
           camera={{ fov: mobile ? 62 : 55, near: 0.1, far: 220, position: [0, 0, 0] }}
-          gl={{ antialias: !mobile, powerPreference: 'high-performance' }}
+          gl={{ antialias: false, powerPreference: 'high-performance' }}
         >
           <World mobile={mobile}/>
+          {mobile ? (
+            <EffectComposer multisampling={0}>
+              <Vignette offset={0.3} darkness={0.55}/>
+              <ToneMapping mode={ToneMappingMode.ACES_FILMIC}/>
+            </EffectComposer>
+          ) : (
+            <EffectComposer multisampling={4}>
+              <Bloom mipmapBlur intensity={0.75} luminanceThreshold={0.6} luminanceSmoothing={0.25}/>
+              <Vignette offset={0.25} darkness={0.65}/>
+              <ToneMapping mode={ToneMappingMode.ACES_FILMIC}/>
+            </EffectComposer>
+          )}
         </Canvas>
       </SceneBoundary>
     </div>

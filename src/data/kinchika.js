@@ -118,7 +118,7 @@ export const DISCIPLINAS = [
 
 export const ALLIES = [
   { name: 'Molchanovs', url: 'https://molchanovs.com/', logo: 'img/logos/molchanovs.png' },
-  { name: 'IND · Instituto Nacional del Deporte', url: 'https://ind.cl/', logo: 'img/logos/ind.png' },
+  { name: 'IND · Instituto Nacional del Deporte', url: 'https://ind.cl/', logo: 'img/logos/ind-mono.png' },  // versión blanca sobre transparente (el original tiene fondo azul/rojo)
   { name: 'Lo Prado Deportes', url: 'https://lopradodeportes.cl/', logo: 'img/logos/loprado.png' },
   { name: 'Asosub Santiago', url: 'https://www.instagram.com/asosub.santiago/', logo: 'img/logos/asosub.png' },
   { name: 'FEDESUB Chile', url: 'https://www.fedesub.cl/index.html', logo: 'img/logos/fedesub.png' }

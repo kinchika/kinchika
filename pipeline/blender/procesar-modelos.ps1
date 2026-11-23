@@ -6,8 +6,8 @@
   Busca blender.exe automáticamente (o usa -Blender "ruta\blender.exe") y ejecuta
   preparar_modelo.py para cada modelo que encuentre:
 
-    pipeline\out\buzo-rig.*  (o buzo-higgsfield.*)  → public\models\buzo.glb  (+ buzo.blend para editar)
-    pipeline\out\jurel-higgsfield.*                 → public\models\jurel.glb
+    pipeline\out\buzo-rig.*  (o buzo-higgsfield.*, buzo-sketchfab.*)  → public\models\buzo.glb  (+ buzo.blend)
+    pipeline\out\jurel-higgsfield.*  (o jurel-sketchfab.*)            → public\models\jurel.glb
     pipeline\out\reineta-higgsfield.*               → public\models\reineta.glb
     pipeline\out\anchoveta-higgsfield.*             → public\models\anchoveta.glb
 
@@ -85,14 +85,29 @@ if ($Demo) {
 
 $buzo = Buscar 'buzo-rig.*'
 if (-not $buzo) { $buzo = Buscar 'buzo-higgsfield.*' }
-if ($buzo) { Preparar 'buzo' $buzo.FullName (Join-Path $Models 'buzo.glb') @('--guardar-blend') }
+if (-not $buzo) { $buzo = Buscar 'buzo-sketchfab.*' }
+# "pPlane": plano auxiliar que traen algunos modelos de Sketchfab exportados desde Maya
+if ($buzo) { Preparar 'buzo' $buzo.FullName (Join-Path $Models 'buzo.glb') @('--guardar-blend', '--quitar', 'pPlane') }
 else { Write-Host "`n(no hay modelo de buzo en pipeline\out)" -ForegroundColor DarkGray }
+
+# Ajustes conocidos por archivo (revisados a mano: hacia dónde mira y si viene de cabeza)
+$AjustesPorArchivo = @{
+  # "Atlantic Mackerel (Animated and Game-ready)" de Ishxxn, Sketchfab, CC BY 4.0
+  'jurel-sketchfab' = @('--invertir', '--voltear', '--caras', '7000', '--ancho', '0.13')
+  # "Sardine" de Drake (dlp14c), Sketchfab, CC BY 4.0
+  'anchoveta-sketchfab' = @('--invertir', '--caras', '3000')
+  # "Fish" de VeeRuby Technologies, Sketchfab, CC BY 4.0 (reducir caras rompe las aletas)
+  'reineta-sketchfab' = @('--caras', '3000')
+}
 
 foreach ($pez in @('jurel', 'reineta', 'anchoveta')) {
   $f = Buscar "$pez-higgsfield.*"
+  if (-not $f) { $f = Buscar "$pez-sketchfab.*" }
   if (-not $f) { Write-Host "(no hay modelo de $pez en pipeline\out)" -ForegroundColor DarkGray; continue }
   $extra = @()
-  if ($Invertir -contains $pez) { $extra += '--invertir' }
+  $clave = [IO.Path]::GetFileNameWithoutExtension($f.Name)
+  if ($AjustesPorArchivo.ContainsKey($clave)) { $extra += $AjustesPorArchivo[$clave] }
+  if ($Invertir -contains $pez -and $extra -notcontains '--invertir') { $extra += '--invertir' }
   Preparar 'pez' $f.FullName (Join-Path $Models "$pez.glb") $extra
 }
 

@@ -36,9 +36,13 @@ export const INTERLUDES = {
  * Modelos 3D animados que aparecen en la escena.
  *  depthM     profundidad (m) donde vive el modelo
  *  follow     [desdeM, hastaM]: el modelo acompaña a la cámara en ese tramo
+ *  followOffsetM  metros bajo la cámara mientras la acompaña (más = más abajo en pantalla)
  *  position   [x, z] en unidades del mundo (la cámara está en x=0, mirando a −z)
  *  height     alto deseado en unidades del mundo (se normaliza el modelo)
  *  rotationY  giro en radianes
+ *  rotation   [x, y, z, orden] giro completo (reemplaza a rotationY)
+ *  turnOnAscent  si es true, al hacer scroll hacia arriba el modelo da una voltereta
+ *             y sube de cabeza hacia la superficie (y vuelve a girar al bajar)
  *  animation  nombre del clip a reproducir, o 'auto' para el primero
  */
 export const MODELS = [
@@ -46,12 +50,24 @@ export const MODELS = [
     id: 'buzo',
     src: 'models/buzo.glb',
     depthM: 20,
-    follow: [6, 62],
+    follow: [6, 99],
+    followOffsetM: 0.5,
     position: [4.2, -11],
-    height: 3.2,
-    rotationY: -Math.PI / 2,
+    height: 3.6,
+    // el modelo nada hacia +Z con la espalda hacia +Y: se pone de cabeza (descenso)
+    // y se gira en 3/4 para ver el tanque y las aletas
+    rotation: [Math.PI / 2 + 0.35, 0.6, 0, 'YXZ'],
+    turnOnAscent: true,
     animation: 'auto',
   },
+];
+
+/** Modelos de terceros (licencia CC BY 4.0: hay que nombrar al autor). */
+export const CREDITS = [
+  { title: 'Diver', author: 'ucdavisterc', url: 'https://skfb.ly/oIOZJ' },
+  { title: 'Atlantic Mackerel (Animated and Game-ready)', author: 'Ishxxn', url: 'https://skfb.ly/pMyHY' },
+  { title: 'Sardine', author: 'Drake', url: 'https://skfb.ly/6vYqN' },
+  { title: 'Fish', author: 'VeeRuby Technologies Pvt Ltd', url: 'https://skfb.ly/oErFY' },
 ];
 
 /**

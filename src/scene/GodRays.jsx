@@ -18,9 +18,12 @@ const fragment = /* glsl */`
   uniform float uSeed;
   varying vec2 vUv;
   void main() {
-    float across = pow(sin(3.14159 * vUv.x), 2.5);
-    float down = pow(vUv.y, 1.6);                       // brillante arriba, se pierde abajo
-    float shimmer = 0.55 + 0.45 * sin(uTime * 0.7 + uSeed * 6.283 + vUv.y * 4.0);
+    // con antialiasing (MSAA) el uv puede salir levemente de 0..1; pow() con base
+    // negativa da NaN y el bloom lo esparce por toda la pantalla
+    vec2 uv = clamp(vUv, 0.0, 1.0);
+    float across = pow(max(sin(3.14159 * uv.x), 0.0), 2.5);
+    float down = pow(uv.y, 1.6);                        // brillante arriba, se pierde abajo
+    float shimmer = 0.55 + 0.45 * sin(uTime * 0.7 + uSeed * 6.283 + uv.y * 4.0);
     float a = across * down * shimmer * uOpacity;
     gl_FragColor = vec4(vec3(0.72, 0.9, 1.0) * a, a);
   }

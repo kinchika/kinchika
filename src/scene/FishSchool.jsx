@@ -13,7 +13,7 @@ import { mToY } from './palette.js';
 
 const X_AXIS = new Vector3(1, 0, 0);
 
-function makeMaterial({ color, emissive, metalness, roughness, map }) {
+function makeMaterial({ color, back, emissive, metalness, roughness, map }) {
   const mat = new MeshStandardMaterial({
     color: new Color(color),
     emissive: new Color(emissive),
@@ -23,18 +23,31 @@ function makeMaterial({ color, emissive, metalness, roughness, map }) {
     side: DoubleSide,
     map: map || null,
   });
-  const uniforms = { uTime: { value: 0 } };
+  // con textura real el pez ya trae su lomo oscuro: la contrasombra procedural se desactiva
+  const uniforms = { uTime: { value: 0 }, uBack: { value: new Color(back) }, uBackMix: { value: map ? 0 : 0.9 } };
   mat.onBeforeCompile = (shader) => {
     shader.uniforms.uTime = uniforms.uTime;
+    shader.uniforms.uBack = uniforms.uBack;
+    shader.uniforms.uBackMix = uniforms.uBackMix;
     shader.vertexShader = shader.vertexShader
       .replace('#include <common>', `#include <common>
         uniform float uTime;
         attribute float aPhase;
-        attribute float aFreq;`)
+        attribute float aFreq;
+        varying float vLy;`)
       .replace('#include <begin_vertex>', `#include <begin_vertex>
+        vLy = position.y;
         float tailW = smoothstep(0.3, -0.55, transformed.x);
         float wave = sin(uTime * aFreq + aPhase - transformed.x * 6.0);
         transformed.z += wave * 0.085 * (0.2 + tailW);`);
+    // contrasombra: lomo oscuro azul verdoso, flancos y vientre plateados
+    shader.fragmentShader = shader.fragmentShader
+      .replace('#include <common>', '#include <common>\nuniform vec3 uBack;\nuniform float uBackMix;\nvarying float vLy;')
+      .replace('#include <color_fragment>', `#include <color_fragment>
+        float backMask = smoothstep(0.0, 0.1, vLy) * uBackMix / 0.9;
+        diffuseColor.rgb = mix(diffuseColor.rgb, uBack, backMask * 0.9);`)
+      .replace('#include <metalnessmap_fragment>', `#include <metalnessmap_fragment>
+        metalnessFactor *= mix(1.0, 0.35, backMask);`);
   };
   return { mat, uniforms };
 }
@@ -50,13 +63,14 @@ function makeMaterial({ color, emissive, metalness, roughness, map }) {
  * @param {number} props.lag        dispersión a lo largo de la trayectoria
  * @param {number} props.phase      fase inicial de la trayectoria
  * @param {number} props.dir        1 o −1 (sentido de giro)
+ * @param {string} [props.tint]     tinte que multiplica la textura del .glb (si lo hay)
  * @param {string} [props.modelUrl] .glb opcional para la geometría
  */
 export function FishSchool({
   count = 60, depthM = 20, radius = 50, speed = 0.05, size = 1.2,
   spread = [3, 1.6, 3], lag = 0.5, phase = 0, dir = 1, zCenter = -32,
-  color = '#b9c7d3', emissive = '#0a1a26', metalness = 0.55, roughness = 0.32,
-  modelUrl,
+  color = '#b9c7d3', back = '#24404e', emissive = '#0a1a26', metalness = 0.55, roughness = 0.32,
+  tint = '#ffffff', modelUrl,
 }) {
   const mesh = useRef();
   const [custom, setCustom] = useState(null);
@@ -77,10 +91,17 @@ export function FishSchool({
     return g;
   }, [count, custom]);
 
-  const { mat, uniforms } = useMemo(
-    () => makeMaterial({ color, emissive, metalness, roughness, map: custom?.map }),
-    [color, emissive, metalness, roughness, custom],
-  );
+  const { mat, uniforms } = useMemo(() => {
+    const map = custom?.map;
+    // con textura: solo un tinte suave (no el color procedural) y menos metal (si no, la textura se oscurece)
+    return makeMaterial({
+      color: map ? tint : color,
+      back, emissive,
+      metalness: map ? Math.min(metalness, 0.3) : metalness,
+      roughness: map ? Math.max(roughness, 0.38) : roughness,
+      map,
+    });
+  }, [color, back, emissive, metalness, roughness, tint, custom]);
 
   useEffect(() => () => { geometry.dispose(); mat.dispose(); }, [geometry, mat]);
 

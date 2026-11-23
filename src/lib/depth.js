@@ -44,6 +44,8 @@ export function startDepthTracking() {
   window.addEventListener('scroll', schedule, { passive: true });
   window.addEventListener('resize', schedule);
   window.addEventListener('pointermove', (e) => {
+    // solo el mouse mueve la cámara: en celular el dedo se usa para hacer scroll
+    if (e.pointerType !== 'mouse') return;
     depthState.pointerX = (e.clientX / window.innerWidth) * 2 - 1;
     depthState.pointerY = (e.clientY / window.innerHeight) * 2 - 1;
   }, { passive: true });
