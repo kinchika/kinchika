@@ -1,0 +1,9 @@
+node_modules/
+dist/
+.DS_Store
+*.log
+# Salidas temporales del pipeline (Higgsfield / Blender)
+pipeline/out/
+*.blend1
+# proyectos de Blender: se guardan en pipeline/out, nunca en public/
+public/**/*.blend

@@ -1546,6 +1546,15 @@ footer::before {
   text-transform: uppercase;
 }
 
+.footer-credits {
+  margin-top: 20px;
+  font-size: 11px;
+  line-height: 1.6;
+  color: var(--ink-4);
+}
+.footer-credits a { color: inherit; text-decoration: underline; text-underline-offset: 2px; }
+.footer-credits a:hover { color: var(--gold); }
+
 /* ============ RESPONSIVE TEXT ============ */
 .text--mobile { display: none; }
 @media (max-width: 900px) {

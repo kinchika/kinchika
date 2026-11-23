@@ -1,6 +1,6 @@
-/* Kinchika data — events, results, directiva */
+/* Kinchika — contenido del sitio (eventos, resultados, directiva, línea de tiempo) */
 
-const EVENTS = [
+export const EVENTS = [
   { id: 'e1', disc: 'ECO', discLabel: 'Eco', day: 18, month: 'MAY', title: 'Limpieza de playa Quintay', place: 'Quintay · V Región', desc: 'Jornada de recolección de residuos costeros junto a la junta de vecinos local.', level: 'Principiante', cupos: 12, cuposMax: 25, img: 'img/eventos/limpieza-playa.svg' },
   { id: 'e2', disc: 'STA', discLabel: 'Estática', day: 24, month: 'MAY', title: 'Clínica de apnea estática', place: 'Piscina Lo Prado', desc: 'Sesión técnica con énfasis en relajación, contracciones y manejo de la respuesta diafragmática.', level: 'Intermedio', cupos: 4, cuposMax: 12, img: 'img/eventos/clinica-apnea.svg' },
   { id: 'e3', disc: 'DEPTH', discLabel: 'Profundidad', day: 7, month: 'JUN', title: 'Salida a Pichilemu', place: 'Pichilemu · VI Región', desc: 'Inmersión grupal en boya. Profundidades de 12 a 25m con seguidor por cuerda.', level: 'Competitivo', cupos: 0, cuposMax: 8, img: 'img/eventos/salida-pichilemu.svg' },
@@ -9,7 +9,7 @@ const EVENTS = [
   { id: 'e6', disc: 'ECO', discLabel: 'Eco', day: 5, month: 'JUL', title: 'Reforestación dunas Algarrobo', place: 'Algarrobo · V Región', desc: 'Plantación de especies nativas de duna en colaboración con CONAF.', level: 'Principiante', cupos: 18, cuposMax: 40, img: 'img/eventos/limpieza-playa.svg' }
 ];
 
-const RESULTS = {
+export const RESULTS = {
   'interclubes-2025': {
     name: 'Interclubes FEDESUB 2025',
     date: 'Septiembre 2025',
@@ -51,7 +51,7 @@ const RESULTS = {
   }
 };
 
-const DIRECTIVAS = {
+export const DIRECTIVAS = {
   '2026': {
     inicio: 'Ene 2026',
     fin: 'Dic 2026',
@@ -97,7 +97,7 @@ const DIRECTIVAS = {
   }
 };
 
-const TIMELINE = [
+export const TIMELINE = [
   { id: 'grecia', era: 'S. VIII a.C.', icon: '🏛️', title: 'Antigua Grecia · Kálimnos', img: 'img/timeline/grecia.png', text: 'Los griegos se sumergían desnudos arrastrando una <em>skandalopetra</em> — piedra pesada — para llegar al fondo. Llenaban su boca con aceite de oliva y lo escupían en profundidad: rompía la refracción de la luz y mejoraba la visibilidad. Aristóteles y Homero ya escribían sobre ellos.', textMobile: 'Buzos griegos usaban una <em>skandalopetra</em> y aceite de oliva para ver bajo el agua. Citados por Aristóteles y Homero.'},
   { id: 'japon', era: 'S. III a.C.', icon: '🌸', title: 'Japón · Las Ama', img: 'img/timeline/japon-ama.png', text: 'Casi 2.000 años de tradición milenaria de buceo en apnea protagonizada exclusivamente por mujeres. Conocidas como las <em>Mujeres del Mar</em>, recolectaban perlas naturales y mariscos sumergiéndose a grandes profundidades.', textMobile: 'Casi 2.000 años de tradición: las <em>Mujeres del Mar</em> recolectando perlas en apnea.'},
   { id: 'corea', era: 'S. XVII', icon: '🌊', title: 'Corea · Las Haenyeo', img: 'img/timeline/corea-haenyeo.png', text: 'Originarias de la isla de Jeju. Con frecuencia superando los 60 e incluso los 80 años, mantienen viva la tradición de recolectar a mano algas y mariscos, una cultura matriarcal de resistencia y autonomía económica.', textMobile: 'Las <em>Haenyeo</em> de Jeju, cultura matriarcal de buceo en apnea con más de 80 años activas.'},
@@ -105,23 +105,22 @@ const TIMELINE = [
   { id: 'molchanova', era: '2005', icon: '⭐', title: 'Natalia Molchanova', img: 'img/timeline/molchanova.png', text: 'La rusa que en el siglo XXI consolidó el deporte con un dominio absoluto, estableciendo múltiples récords mundiales e integrando la ciencia y el yoga a la disciplina, dejando un legado educativo único.', textMobile: 'Múltiples récords mundiales integrando ciencia y yoga al freediving, legado educativo único.'}
 ];
 
-const SCHEDULE = [
+export const SCHEDULE = [
   { day: 'Martes', tag: 'Día 01', title: 'Nado y acondicionamiento', hour: '21:00 — 22:00', desc: 'Entrenamiento guiado por profesores, centrado en el desarrollo de la natación y capacidades aeróbicas.' },
   { day: 'Miércoles', tag: 'Día 02', title: 'Nado libre', hour: '21:00 — 22:00', desc: 'Cada persona coordina su propio plan de trabajo, promoviendo la crítica constructiva entre compañeros.' },
   { day: 'Jueves', tag: 'Día 03', title: 'Apnea técnica', hour: '21:00 — 22:00', desc: 'Sesión técnica de apnea bajo la supervisión y dirección de nuestros profesores especializados.' }
 ];
 
-const DISCIPLINAS = [
+export const DISCIPLINAS = [
   'Buceo', 'Apnea', 'Nado con aletas', 'Rugby subacuático',
   'Rescatismo', 'Limpieza de playas', 'Educación medioambiental', 'Sensibilización marina'
 ];
 
-const ALLIES = [
+export const ALLIES = [
   { name: 'Molchanovs', url: 'https://molchanovs.com/', logo: 'img/logos/molchanovs.png' },
-  { name: 'IND · Instituto Nacional del Deporte', url: 'https://ind.cl/', logo: 'img/logos/ind.png' },
+  { name: 'IND · Instituto Nacional del Deporte', url: 'https://ind.cl/', logo: 'img/logos/ind-mono.png' },  // versión blanca sobre transparente (el original tiene fondo azul/rojo)
   { name: 'Lo Prado Deportes', url: 'https://lopradodeportes.cl/', logo: 'img/logos/loprado.png' },
   { name: 'Asosub Santiago', url: 'https://www.instagram.com/asosub.santiago/', logo: 'img/logos/asosub.png' },
   { name: 'FEDESUB Chile', url: 'https://www.fedesub.cl/index.html', logo: 'img/logos/fedesub.png' }
 ];
 
-window.KINCHIKA = { EVENTS, RESULTS, DIRECTIVAS, TIMELINE, SCHEDULE, DISCIPLINAS, ALLIES };

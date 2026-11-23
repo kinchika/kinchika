@@ -1,0 +1,115 @@
+/* =========================================
+   KINCHIKA 2.0 — escena 3D, interludios y animaciones
+   ========================================= */
+
+/* Escena WebGL fija detrás del contenido */
+#ocean-scene {
+  position: fixed;
+  inset: 0;
+  z-index: -2;
+  pointer-events: none;
+}
+#ocean-scene canvas { display: block; }
+
+/* Respaldo si no hay WebGL: degradado de profundidad */
+#deep-bg {
+  background: linear-gradient(180deg, #0f4c70 0%, #06203a 30%, #020b17 65%, #000306 100%);
+  background-attachment: fixed;
+}
+
+#vignette {
+  background:
+    radial-gradient(ellipse at center, transparent 45%, rgba(0, 0, 0, 0.5) 100%);
+}
+
+/* Hero: deja ver la escena (superficie y rayos de luz) */
+.video-overlay-gradient {
+  background:
+    linear-gradient(180deg, transparent 0%, transparent 55%, rgba(2, 8, 14, 0.55) 100%),
+    linear-gradient(90deg, rgba(2, 8, 14, 0.55) 0%, transparent 55%);
+}
+.water-shimmer { height: 42vh; }
+.water-shimmer video { opacity: 0.85; }
+/* con la escena 3D activa, el video de la portada se dibuja dentro de ella (SkyVideo) */
+.has-scene-sky .water-shimmer { display: none; }
+
+a.nav__brand { text-decoration: none; }
+
+/* ---------- Revelado al hacer scroll ---------- */
+.reveal {
+  opacity: 0;
+  transform: translateY(28px);
+  transition:
+    opacity 0.9s cubic-bezier(0.2, 0.8, 0.2, 1) var(--reveal-delay, 0ms),
+    transform 0.9s cubic-bezier(0.2, 0.8, 0.2, 1) var(--reveal-delay, 0ms);
+}
+.reveal.is-in { opacity: 1; transform: none; }
+
+/* ---------- Interludios de video (Higgsfield) ---------- */
+.interlude {
+  position: relative;
+  z-index: 1;
+  height: 0;
+  overflow: hidden;
+  opacity: 0;
+  transition: opacity 1.2s ease;
+}
+.interlude.is-ready {
+  height: min(78vh, 56.25vw);
+  min-height: 320px;
+  opacity: 1;
+}
+.interlude__video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  mix-blend-mode: screen;               /* el negro del video se funde con el agua */
+  -webkit-mask-image: linear-gradient(180deg, transparent 0%, #000 18%, #000 82%, transparent 100%);
+  mask-image: linear-gradient(180deg, transparent 0%, #000 18%, #000 82%, transparent 100%);
+}
+.interlude__caption {
+  position: absolute;
+  left: max(32px, calc((100vw - var(--container)) / 2 + 32px));
+  bottom: 14%;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  max-width: 420px;
+}
+.interlude__depth {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.32em;
+  color: var(--gold);
+}
+.interlude__title {
+  font-family: var(--serif);
+  font-weight: 300;
+  font-size: clamp(28px, 4vw, 52px);
+  line-height: 1.05;
+  color: var(--ink);
+  text-shadow: 0 4px 30px rgba(0, 0, 0, 0.6);
+}
+.interlude__note {
+  font-size: 14px;
+  color: var(--ink-2);
+}
+
+/* Foco visible para teclado */
+:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 3px;
+}
+.timeline-node:focus-visible, .table-card:focus-visible { border-radius: 16px; }
+
+@media (max-width: 900px) {
+  .interlude.is-ready { height: 62vh; }
+  .interlude__caption { left: 20px; right: 20px; bottom: 10%; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal { opacity: 1; transform: none; transition: none; }
+  html, body { scroll-behavior: auto; }
+}
