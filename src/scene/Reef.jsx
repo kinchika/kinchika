@@ -4,15 +4,14 @@
  * bajas, con cáusticas de luz cerca de la superficie y algas que se mecen.
  */
 import { useEffect, useMemo } from 'react';
-import { useFrame } from '@react-three/fiber';
 import {
   BufferAttribute, Color, DoubleSide, InstancedBufferAttribute, Matrix4, MeshStandardMaterial,
   NoColorSpace, Object3D, PlaneGeometry, Quaternion, RepeatWrapping, SRGBColorSpace, TextureLoader, Vector3,
 } from 'three';
 import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
-import { depthState, MOTION } from '../lib/depth.js';
 import { fbm, ridged } from './noise.js';
-import { mToY, sunlight } from './palette.js';
+import { mToY } from './palette.js';
+import { withCaustics } from './caustics.js';
 
 const TOP_Y = 14;          // borde superior del paredón (bajo la superficie)
 const BOTTOM_Y = -470;     // bajo los 100 m
@@ -22,60 +21,36 @@ const smooth = (a, b, x) => {
   return t * t * (3 - 2 * t);
 };
 
+/** Escalones de estratos: repisas horizontales con cara casi vertical, como roca sedimentaria. */
+function strata(y, x) {
+  const h = 15 + fbm(x * 0.02, 1.7, 2) * 8;              // alto de cada estrato (varía a lo largo)
+  const v = (y + fbm(x * 0.025, y * 0.01 + 4.2, 3) * 14) / h;  // estratos inclinados y quebrados
+  const f = v - Math.floor(v);
+  // diente de sierra centrado en 0: cara inclinada y luego un salto (repisa)
+  return smooth(0.55, 0.95, f) - f;
+}
+
 /**
  * Posición z de la superficie de la roca en (x, y).
  * A la izquierda el paredón se acerca; a la derecha se aleja y se pierde en el
- * azul, dejando agua abierta donde están la boya y el buzo.
+ * azul, dejando agua abierta donde están el barco, el cabo y el buzo.
  */
-export function wallZ(x, y) {
+function wallZ(x, y) {
   const depth = Math.max(0, -y);
   const near = x < 0 ? (x / 100) ** 2 * 34 : 0;  // la costa se acerca por la izquierda
-  const recede = smooth(-20, 90, x) * 110;       // y se abre a mar abierto por la derecha
+  const recede = smooth(-20, 90, x) * 110 + Math.max(0, x - 90) * 0.55; // y se abre a mar abierto
   const slope = depth * 0.06;                    // más lejos a medida que baja
   const big = fbm(x * 0.011 + 3.1, y * 0.011, 3) * 16;
+  // contrafuertes verticales y estratos: el paredón no es una pared lisa
+  const ribs = ridged(x * 0.035 + 7.7, y * 0.008, 3) * 8;
+  // repisas solo en algunas zonas (no un patrón parejo en todo el paredón)
+  const ledges = strata(y, x) * 9 * smooth(-0.05, 0.35, fbm(x * 0.012 + 5.5, y * 0.008, 3));
   const rock = ridged(x * 0.045, y * 0.045, 4) * 9;
-  return -78 + near - recede - slope + big + rock;
+  const grit = ridged(x * 0.16 + 2.3, y * 0.16, 3) * 2.6;  // fracturas pequeñas
+  return -78 + near - recede - slope + big + ribs + ledges + rock + grit;
 }
 
-// ─────────────── cáusticas (luz de la superficie sobre la roca y las algas) ───────────────
-
-const causticsGLSL = /* glsl */`
-  uniform float uTime;
-  uniform float uCaustic;
-  varying vec3 vWPos;
-  float causLayer(vec2 p, float t) {
-    float a = sin(p.x * 0.9 + t * 0.8 + sin(p.y * 0.7 - t * 0.6) * 1.8);
-    float b = sin(p.y * 1.1 - t * 0.7 + sin(p.x * 0.8 + t * 0.5) * 1.6);
-    float c = sin((p.x - p.y) * 0.6 + t * 0.9);
-    float w = (a + b + 0.6 * c) / 2.6;
-    return pow(1.0 - abs(w), 7.0);
-  }
-  float caustics(vec3 wp, float t) {
-    vec2 p = vec2(wp.x, wp.z + wp.y * 0.45) * 0.24;
-    return causLayer(p, t) + 0.6 * causLayer(p * 1.9 + 7.3, t * 1.3);
-  }
-`;
-
-function withCaustics(material, uniforms) {
-  material.onBeforeCompile = (shader) => {
-    Object.assign(shader.uniforms, uniforms);
-    shader.vertexShader = shader.vertexShader
-      .replace('#include <common>', '#include <common>\nvarying vec3 vWPos;')
-      .replace('#include <project_vertex>', `#include <project_vertex>
-        #ifdef USE_INSTANCING
-          vWPos = (modelMatrix * instanceMatrix * vec4(transformed, 1.0)).xyz;
-        #else
-          vWPos = (modelMatrix * vec4(transformed, 1.0)).xyz;
-        #endif`);
-    shader.fragmentShader = shader.fragmentShader
-      .replace('#include <common>', `#include <common>\n${causticsGLSL}`)
-      .replace('#include <emissivemap_fragment>', `#include <emissivemap_fragment>
-        float shallow = smoothstep(-130.0, -8.0, vWPos.y);
-        // la cáustica es luz extra sobre la superficie: se modula por el color propio
-        totalEmissiveRadiance += diffuseColor.rgb * vec3(0.75, 1.0, 1.05) * caustics(vWPos, uTime) * uCaustic * shallow;`);
-  };
-  return material;
-}
+// las cáusticas (luz de la superficie sobre la roca y las algas) están en caustics.js
 
 // ─────────────── roca ───────────────
 
@@ -85,20 +60,34 @@ const ROCK_LIGHT = new Color('#544a41');
 const CORALLINE = new Color('#5c3c44');   // algas calcáreas rosadas de la roca chilena
 const ALGAE = new Color('#323b1c');
 
-/** Borde superior irregular del paredón (bajo la superficie). */
-const topAt = (x) => TOP_Y - 26 * (fbm(x * 0.014, 9.1, 3) * 0.5 + 0.5);
+/**
+ * Borde superior del paredón (bajo la superficie): lomas redondeadas, como roca
+ * gastada por el mar (sin agujas ni picos). Hacia la derecha la roca baja en una
+ * ladera hasta el fondo, en vez de terminar en un corte vertical.
+ */
+const topAt = (x) => {
+  const crest = fbm(x * 0.014, 9.1, 3) * 0.5 + 0.5;
+  const mounds = fbm(x * 0.04 + 1.3, 3.3, 2);              // lomas suaves (−1..1)
+  const wobble = fbm(x * 0.15, 6.6, 2) * 0.8;              // borde algo irregular, sin puntas
+  const descend = smooth(35, 330, x) ** 1.4 * 230;         // ladera hacia el mar abierto
+  return TOP_Y - 30 * crest + 7 * (mounds - 0.6) + wobble - descend;  // no asoma del agua
+};
+
+const X_MIN = -170;
+const X_MAX = 380;   // más allá de lo que alcanza a ver la cámara: sin borde visible
 
 function makeRockGeometry(mobile) {
-  const width = 300;
-  const height = TOP_Y - BOTTOM_Y;
-  const g = new PlaneGeometry(width, height, mobile ? 90 : 160, mobile ? 150 : 260);
-  g.translate(0, (TOP_Y + BOTTOM_Y) / 2, 0);
+  const width = X_MAX - X_MIN;
+  const g = new PlaneGeometry(width, 1, mobile ? 150 : 320, mobile ? 170 : 300);
   const pos = g.attributes.position;
   for (let i = 0; i < pos.count; i++) {
-    const x = pos.getX(i);
-    const y = Math.min(pos.getY(i), topAt(x));
-    pos.setY(i, y);
-    pos.setZ(i, wallZ(x, y));
+    const x = pos.getX(i) + (X_MIN + X_MAX) / 2;
+    // cada columna se estira desde el fondo hasta su propio borde superior:
+    // así el borde queda definido por vértices, sin escalones de la malla
+    const v = pos.getY(i) + 0.5;                     // 0 abajo, 1 arriba
+    const top = topAt(x);
+    const y = BOTTOM_Y + (top - BOTTOM_Y) * v ** 0.85;  // más filas cerca del borde
+    pos.setXYZ(i, x, y, wallZ(x, y));
   }
   g.computeVertexNormals();
 
@@ -242,7 +231,7 @@ function makeKelpGeometry(H) {
   return merged;
 }
 
-function kelpMaterial(uniforms, H) {
+function kelpMaterial(H) {
   const mat = new MeshStandardMaterial({
     color: new Color('#5a4a1e'),
     emissive: new Color('#140f04'),
@@ -250,9 +239,9 @@ function kelpMaterial(uniforms, H) {
     metalness: 0,
     side: DoubleSide,
   });
-  const base = withCaustics(mat, uniforms).onBeforeCompile;
-  mat.onBeforeCompile = (shader) => {
-    base(shader);
+  const base = withCaustics(mat).onBeforeCompile;
+  mat.onBeforeCompile = (shader, renderer) => {
+    base(shader, renderer);
     shader.uniforms.uKelpH = { value: H };
     shader.vertexShader = shader.vertexShader
       .replace('#include <common>', '#include <common>\nattribute float aPhase;\nuniform float uKelpH;\nuniform float uTime;')
@@ -262,10 +251,11 @@ function kelpMaterial(uniforms, H) {
         transformed.x += sin(uTime * 0.55 + aPhase + transformed.y * 0.12) * sway * 2.4;
         transformed.z += cos(uTime * 0.42 + aPhase * 1.7 + transformed.y * 0.09) * sway * 1.3;`);
   };
+  mat.customProgramCacheKey = () => `kinchika-kelp-${H}`;
   return mat;
 }
 
-function KelpGroup({ items, H, uniforms }) {
+function KelpGroup({ items, H }) {
   const geometry = useMemo(() => {
     const g = makeKelpGeometry(H);
     const phases = new Float32Array(items.length);
@@ -273,7 +263,7 @@ function KelpGroup({ items, H, uniforms }) {
     g.setAttribute('aPhase', new InstancedBufferAttribute(phases, 1));
     return g;
   }, [H, items]);
-  const material = useMemo(() => kelpMaterial(uniforms, H), [uniforms, H]);
+  const material = useMemo(() => kelpMaterial(H), [H]);
   useEffect(() => () => { geometry.dispose(); material.dispose(); }, [geometry, material]);
 
   const ref = (mesh) => {
@@ -294,7 +284,6 @@ function KelpGroup({ items, H, uniforms }) {
 }
 
 export function Reef({ mobile }) {
-  const uniforms = useMemo(() => ({ uTime: { value: 0 }, uCaustic: { value: 1 } }), []);
   const rockGeo = useMemo(() => makeRockGeometry(mobile), [mobile]);
   const rockUniforms = useMemo(() => ({
     uRockDiff: { value: null }, uRockNor: { value: null }, uRockOn: { value: 0 },
@@ -302,7 +291,7 @@ export function Reef({ mobile }) {
   useEffect(() => loadRockTextures(rockUniforms), [rockUniforms]);
   const rockMat = useMemo(() => withRockTexture(withCaustics(new MeshStandardMaterial({
     vertexColors: true, roughness: 0.95, metalness: 0,
-  }), uniforms), rockUniforms, mobile), [uniforms, rockUniforms, mobile]);
+  })), rockUniforms, mobile), [rockUniforms, mobile]);
   useEffect(() => () => { rockGeo.dispose(); rockMat.dispose(); }, [rockGeo, rockMat]);
 
   // huirales: anclados a la roca entre 8 y 22 m, con la punta cerca de la superficie
@@ -327,16 +316,11 @@ export function Reef({ mobile }) {
     return groups;
   }, [mobile]);
 
-  useFrame((state) => {
-    uniforms.uTime.value = state.clock.elapsedTime * MOTION;
-    uniforms.uCaustic.value = 1.8 * sunlight(depthState.smooth);
-  });
-
   return (
     <group>
       <mesh geometry={rockGeo} material={rockMat}/>
-      <KelpGroup items={kelp[40]} H={40} uniforms={uniforms}/>
-      <KelpGroup items={kelp[70]} H={70} uniforms={uniforms}/>
+      <KelpGroup items={kelp[40]} H={40}/>
+      <KelpGroup items={kelp[70]} H={70}/>
     </group>
   );
 }

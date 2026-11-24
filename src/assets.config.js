@@ -41,6 +41,9 @@ export const INTERLUDES = {
  *  height     alto deseado en unidades del mundo (se normaliza el modelo)
  *  rotationY  giro en radianes
  *  rotation   [x, y, z, orden] giro completo (reemplaza a rotationY)
+ *  bubbles    si es true, suelta burbujas de regulador desde la cabeza (buzo con tanque)
+ *  useLane    si es true, en pantallas anchas se ubica en el carril libre a la derecha del texto
+ *  belowBoat  si es true, nunca sube por encima de una línea bajo el barco de la portada
  *  turnOnAscent  si es true, al hacer scroll hacia arriba el modelo da una voltereta
  *             y sube de cabeza hacia la superficie (y vuelve a girar al bajar)
  *  animation  nombre del clip a reproducir, o 'auto' para el primero
@@ -58,17 +61,34 @@ export const MODELS = [
     // y se gira en 3/4 para ver el tanque y las aletas
     rotation: [Math.PI / 2 + 0.35, 0.6, 0, 'YXZ'],
     turnOnAscent: true,
+    // en pantallas anchas, nada por el carril libre a la derecha del texto
+    useLane: true,
+    // exhala burbujas por el regulador cada ~4,5 s
+    bubbles: true,
+    // no sube más allá de una línea bajo el casco del barco de la portada
+    belowBoat: true,
     animation: 'auto',
   },
 ];
 
-/** Modelos de terceros (licencia CC BY 4.0: hay que nombrar al autor). */
+/**
+ * Recursos de terceros que usa la escena. CC BY 4.0 exige nombrar al autor y
+ * enlazar la obra y la licencia (el formato es libre: aquí, tarjetas en el pie).
+ *   use      para qué se usa en la web
+ */
 export const CREDITS = [
-  { title: 'Diver', author: 'ucdavisterc', url: 'https://skfb.ly/oIOZJ' },
-  { title: 'Atlantic Mackerel (Animated and Game-ready)', author: 'Ishxxn', url: 'https://skfb.ly/pMyHY' },
-  { title: 'Sardine', author: 'Drake', url: 'https://skfb.ly/6vYqN' },
-  { title: 'Fish', author: 'VeeRuby Technologies Pvt Ltd', url: 'https://skfb.ly/oErFY' },
+  { use: 'Buzo', title: 'Diver', author: 'ucdavisterc', url: 'https://skfb.ly/oIOZJ', license: 'CC BY 4.0' },
+  { use: 'Barco', title: 'Motor Yacht', author: 'gogiart', url: 'https://skfb.ly/pETVG', license: 'CC BY 4.0', note: 'casco repintado y simplificado' },
+  { use: 'Jurel', title: 'Atlantic Mackerel (Animated and Game-ready)', author: 'Ishxxn', url: 'https://skfb.ly/pMyHY', license: 'CC BY 4.0' },
+  { use: 'Anchoveta', title: 'Sardine', author: 'Drake', url: 'https://skfb.ly/6vYqN', license: 'CC BY 4.0' },
+  { use: 'Reineta', title: 'Fish', author: 'VeeRuby Technologies Pvt Ltd', url: 'https://skfb.ly/oErFY', license: 'CC BY 4.0' },
+  { use: 'Roca', title: 'Rock Face', author: 'Poly Haven', url: 'https://polyhaven.com/a/rock_face', license: 'CC0' },
 ];
+
+export const LICENSE_URLS = {
+  'CC BY 4.0': 'https://creativecommons.org/licenses/by/4.0/',
+  CC0: 'https://creativecommons.org/publicdomain/zero/1.0/',
+};
 
 /**
  * Geometría opcional para los cardúmenes. Si existe el .glb, sus peces

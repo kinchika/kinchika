@@ -27,6 +27,10 @@ function tick() {
   raf = requestAnimationFrame(tick);
 }
 
+/** El filtro solo se actualiza mientras suena (en pausa no gasta cuadros). */
+function onPlay() { cancelAnimationFrame(raf); if (filter) tick(); emit(); }
+function onPause() { cancelAnimationFrame(raf); emit(); }
+
 function setupGraph() {
   const AC = window.AudioContext || window.webkitAudioContext;
   if (!AC) return;
@@ -38,7 +42,6 @@ function setupGraph() {
     filter.Q.value = 0.7;
     gain = ctx.createGain();
     source.connect(filter).connect(gain).connect(ctx.destination);
-    tick();
   } catch {
     ctx = null; // sin Web Audio: se reproduce tal cual
   }
@@ -48,8 +51,8 @@ export function startAudio() {
   if (!audio) {
     audio = new Audio(SRC);
     audio.loop = true;
-    audio.addEventListener('play', emit);
-    audio.addEventListener('pause', emit);
+    audio.addEventListener('play', onPlay);
+    audio.addEventListener('pause', onPause);
     setupGraph();
     // con Web Audio el volumen lo controla el nodo de ganancia
     audio.volume = ctx ? 1 : 0.45;
@@ -70,4 +73,3 @@ export function onAudioChange(fn) {
   return () => subs.delete(fn);
 }
 
-export function stopAudioLoop() { cancelAnimationFrame(raf); }

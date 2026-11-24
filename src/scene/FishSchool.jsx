@@ -5,13 +5,14 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useFrame } from '@react-three/fiber';
 import {
-  Color, DoubleSide, InstancedBufferAttribute, MeshStandardMaterial, Object3D, Quaternion, Vector3,
+  Color, DoubleSide, InstancedBufferAttribute, Matrix4, MeshStandardMaterial, Object3D, Vector3,
 } from 'three';
 import { MOTION } from '../lib/depth.js';
 import { loadFishGeometry, makeFishGeometry } from './fishGeometry.js';
+import { withCaustics } from './caustics.js';
 import { mToY } from './palette.js';
 
-const X_AXIS = new Vector3(1, 0, 0);
+const UP = new Vector3(0, 1, 0);
 
 function makeMaterial({ color, back, emissive, metalness, roughness, map }) {
   const mat = new MeshStandardMaterial({
@@ -49,6 +50,8 @@ function makeMaterial({ color, back, emissive, metalness, roughness, map }) {
       .replace('#include <metalnessmap_fragment>', `#include <metalnessmap_fragment>
         metalnessFactor *= mix(1.0, 0.35, backMask);`);
   };
+  // la red de luz de la superficie también pasa por el cuerpo de los peces
+  withCaustics(mat, { strength: 0.8 });
   return { mat, uniforms };
 }
 
@@ -118,7 +121,8 @@ export function FishSchool({
 
   const baseY = mToY(depthM);
   const tmp = useMemo(() => ({
-    o: new Object3D(), a: new Vector3(), b: new Vector3(), d: new Vector3(), q: new Quaternion(),
+    o: new Object3D(), a: new Vector3(), b: new Vector3(), d: new Vector3(),
+    side: new Vector3(), up: new Vector3(), m: new Matrix4(),
   }), []);
 
   const path = (t, out) => out.set(
@@ -137,7 +141,7 @@ export function FishSchool({
 
     const T = state.clock.elapsedTime * MOTION;
     uniforms.uTime.value = T;
-    const { o, a, b, d, q } = tmp;
+    const { o, a, b, d, side, up, m } = tmp;
     for (let i = 0; i < fish.length; i++) {
       const f = fish[i];
       const t = phase + dir * (T * speed - f.lag);
@@ -146,9 +150,14 @@ export function FishSchool({
       d.subVectors(b, a).normalize();
       a.add(f.off);
       a.y += Math.sin(T * 0.8 + f.wob) * 0.25;
-      q.setFromUnitVectors(X_AXIS, d);
+      // orientación con el lomo siempre hacia arriba: el pez mira a +X local.
+      // (setFromUnitVectors toma el giro más corto y, al nadar hacia −X, a veces
+      // lo hacía girando sobre Z: el pez quedaba panza arriba)
+      side.crossVectors(d, UP).normalize();
+      up.crossVectors(side, d);
+      m.makeBasis(d, up, side);
       o.position.copy(a);
-      o.quaternion.copy(q);
+      o.quaternion.setFromRotationMatrix(m);
       o.scale.setScalar(f.scale);
       o.updateMatrix();
       mesh.current.setMatrixAt(i, o.matrix);

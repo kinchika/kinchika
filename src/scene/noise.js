@@ -6,7 +6,7 @@ function hash(x, y) {
 }
 
 /** Ruido suave en −1..1 */
-export function noise2(x, y) {
+function noise2(x, y) {
   const xi = Math.floor(x);
   const yi = Math.floor(y);
   const xf = x - xi;

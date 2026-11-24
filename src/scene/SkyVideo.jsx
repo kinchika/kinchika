@@ -1,7 +1,7 @@
 /*
  * Portada "mitad arriba, mitad abajo": el video del atardecer sobre el mar
  * (video/mar-final.mp4) se dibuja DENTRO de la escena 3D, opaco sobre la línea
- * de flotación y fundiéndose con el mar 3D bajo ella. Así la boya 3D puede
+ * de flotación y fundiéndose con el mar 3D bajo ella. Así el barco 3D puede
  * flotar justo en esa línea y el cabo nace de ella (no "del cielo").
  *
  * El video sube con el scroll igual que el resto de la portada.
@@ -13,7 +13,7 @@ import { PlaneGeometry, ShaderMaterial, SRGBColorSpace, VideoTexture } from 'thr
 const SRC = 'video/mar-final.mp4';
 const VIDEO_ASPECT = 1880 / 1080;
 /** Altura de la línea de flotación dentro del video (fracción desde arriba), medida en el archivo. */
-export const VIDEO_WATERLINE = 0.555;
+const VIDEO_WATERLINE = 0.555;
 /** En pantallas altas (celular) el video ocupa al menos esta fracción del alto visible. */
 const MIN_HEIGHT = 0.6;
 
@@ -40,7 +40,7 @@ const vertex = /* glsl */`
   varying vec2 vNdc;
   void main() {
     vNdc = position.xy;
-    // en el plano lejano: lo 3D opaco que esté delante (la boya) se dibuja encima
+    // en el plano lejano: lo 3D opaco que esté delante (el barco) se dibuja encima
     gl_Position = vec4(position.xy, 0.99999, 1.0);
   }
 `;

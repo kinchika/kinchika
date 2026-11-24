@@ -1,39 +1,27 @@
-/* Línea de tiempo: historia del buceo en apnea */
-import { useState } from 'react';
+/* Línea de tiempo: historia del buceo en apnea.
+   Cada época es una fila: tarjeta con la información a la izquierda y tarjeta
+   con su imagen a la derecha (antes la imagen flotaba abajo a la derecha y
+   tapaba al buzo de la escena 3D). */
 import { TIMELINE } from '../data/kinchika.js';
 
-function TimelineCard({ t, onEnter, onLeave, onToggle, isSelected }) {
+function TimelineEntry({ t }) {
   return (
-    <div
-      className={'timeline-node' + (isSelected ? ' is-selected' : '')}
-      onMouseEnter={() => onEnter(t)}
-      onMouseLeave={onLeave}
-      onClick={onToggle}
-      onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onToggle(); } }}
-      role="button"
-      tabIndex={0}
-      aria-expanded={isSelected}
-    >
+    <article className="timeline-node">
       <div className="timeline-card">
         <span className="era">{t.era}</span>
-        <span className="icon" aria-hidden="true">{t.icon}</span>
-        <h3>{t.title}</h3>
+        <h3><span className="icon" aria-hidden="true">{t.icon}</span>{t.title}</h3>
         <p className="text--desktop" dangerouslySetInnerHTML={{ __html: t.text }}/>
         <p className="text--mobile" dangerouslySetInnerHTML={{ __html: t.textMobile }}/>
       </div>
-      {isSelected && (
-        <div className="timeline-inline-img">
-          <img src={t.img} alt={t.title}/>
-        </div>
-      )}
-    </div>
+      <figure className="timeline-photo">
+        <img src={t.img} alt={t.title} loading="lazy" decoding="async"/>
+        <figcaption>{t.title.split(' · ')[0]}</figcaption>
+      </figure>
+    </article>
   );
 }
 
 export function Timeline() {
-  const [hovered, setHovered] = useState(null);
-  const [selected, setSelected] = useState(null);
-
   return (
     <section id="apnea-historia" className="section section--wide">
       <div className="container">
@@ -44,24 +32,9 @@ export function Timeline() {
         </div>
         <div className="timeline">
           <div className="timeline-track">
-            {TIMELINE.map((t) => (
-              <TimelineCard
-                key={t.id}
-                t={t}
-                onEnter={setHovered}
-                onLeave={() => setHovered(null)}
-                onToggle={() => setSelected((prev) => (prev?.id === t.id ? null : t))}
-                isSelected={selected?.id === t.id}
-              />
-            ))}
+            {TIMELINE.map((t) => <TimelineEntry key={t.id} t={t}/>)}
           </div>
         </div>
-      </div>
-      <div className={'timeline-image-panel' + (hovered ? ' is-active' : '')} aria-hidden="true">
-        {hovered && <>
-          <img src={hovered.img} alt=""/>
-          <div className="panel-label">{hovered.id}</div>
-        </>}
       </div>
     </section>
   );
