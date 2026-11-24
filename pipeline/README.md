@@ -79,6 +79,14 @@ Por cada modelo crudo en `pipeline/out`, `preparar_modelo.py`:
 ¿Quieres probar el proceso sin gastar créditos? `procesar-modelos.ps1 -Demo` crea modelos de prueba
 (bórralos de `public/models` después).
 
+El **barco** de la portada tiene su propio script (casco oscuro, cabina blanca, popa despejada y
+~66.000 triángulos en vez de ~600.000):
+
+```powershell
+& "C:\Program Files\Blender Foundation\Blender 5.2lender.exe" -b -P pipelinelender\preparar_barco.py -- `
+  --entrada pipeline\outarco-sketchfab.glb --salida public\modelsarco.glb
+```
+
 Para un modelo hecho a mano en Blender, expórtalo y procésalo igual:
 
 ```powershell
@@ -96,5 +104,6 @@ Abre <http://localhost:5173>. En `src/assets.config.js` se ajusta todo sin tocar
 - `INTERLUDES`: textos y rutas de los videos.
 - `MODELS`: posición, tamaño, giro, animación y tramo de profundidad en que el buzo acompaña la cámara.
 - `FISH_MODELS`: qué `.glb` usa cada cardumen.
+- `CREDITS`: autor y licencia de cada modelo de terceros (aparecen como tarjetas en el pie).
 
 Cuando esté listo: `npm run build` genera la carpeta `dist/` para publicar.

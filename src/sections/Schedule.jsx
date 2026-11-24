@@ -199,9 +199,9 @@ export function Schedule() {
           ))}
         </div>
 
-        <div className="section__head" style={{marginTop: 80}}>
+        <div className="section__head section__head--sub">
           <div className="eyebrow">Tablas de entrenamiento</div>
-          <h2 className="heading" style={{fontSize: 'clamp(28px, 4vw, 48px)'}}>Hipoxia & Hipercapnia</h2>
+          <h2 className="heading" style={{fontSize: 'clamp(26px, 2.8vw, 40px)'}}>Hipoxia & Hipercapnia</h2>
         </div>
 
         <div className="tables-grid">

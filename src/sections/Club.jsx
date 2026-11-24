@@ -2,7 +2,7 @@
 import { useState } from 'react';
 import { ALLIES, DIRECTIVAS, RESULTS } from '../data/kinchika.js';
 import { IconCamera, IconPin, IconWhatsApp } from '../components/Icons.jsx';
-import { CREDITS } from '../assets.config.js';
+import { CREDITS, LICENSE_URLS } from '../assets.config.js';
 
 // === RESULTS ===
 export function Results() {
@@ -139,7 +139,7 @@ export function Location() {
   );
 }
 
-// === CONTACT + ALLIES ===
+// === CONTACT ===
 export function Contact() {
   return (
     <section id="contacto" className="section section--wide">
@@ -170,21 +170,68 @@ export function Contact() {
             <div className="sub">Síguenos para novedades</div>
           </div>
         </div>
+      </div>
+    </section>
+  );
+}
 
-        <div className="section__head" style={{marginTop: 100, marginBottom: 32}}>
-          <div className="eyebrow">Aliados</div>
-          <h2 className="heading" style={{fontSize: 'clamp(28px, 4vw, 44px)'}}>Nos apoyan</h2>
-        </div>
-        <div className="allies-carousel">
-          <div className="allies-track">
-            {[...ALLIES, ...ALLIES].map((a, i) => (
-              <a key={i} href={a.url} target="_blank" rel="noopener" className="ally-item" title={a.name} aria-hidden={i >= ALLIES.length ? true : undefined} tabIndex={i >= ALLIES.length ? -1 : undefined}>
-                <img src={a.logo} alt={i < ALLIES.length ? a.name : ''} loading="lazy"/>
-              </a>
-            ))}
-          </div>
+// === ALIADOS: franja a todo el ancho, arriba del pie de página ===
+// 3 vueltas de logos por grupo: ~3.900 px, más que cualquier pantalla de escritorio
+const ALLY_GROUP = [...ALLIES, ...ALLIES, ...ALLIES];
+
+function Allies() {
+  return (
+    <section className="allies-band" aria-label="Aliados">
+      <div className="footer-inner allies-band__head">
+        <div className="eyebrow">Aliados</div>
+        <h2 className="allies-band__title">Nos apoyan</h2>
+      </div>
+      <div className="allies-carousel">
+        {/* dos grupos idénticos que se desplazan medio ancho: el bucle no tiene costura.
+            Cada grupo repite los logos hasta cubrir pantallas anchas (sin huecos al final). */}
+        <div className="allies-track" style={{ '--allies-duration': `${ALLY_GROUP.length * 3.6}s` }}>
+          {[0, 1].map((g) => (
+            <div key={g} className="allies-group" aria-hidden={g === 1 ? true : undefined}>
+              {ALLY_GROUP.map((a, i) => {
+                const first = g === 0 && i < ALLIES.length;   // solo la primera aparición es accesible
+                return (
+                  <a key={i} href={a.url} target="_blank" rel="noopener" className="ally-item" title={a.name}
+                    aria-hidden={first ? undefined : true} tabIndex={first ? undefined : -1}>
+                    <img src={a.logo} alt={first ? a.name : ''} decoding="async"/>
+                  </a>
+                );
+              })}
+            </div>
+          ))}
         </div>
       </div>
+    </section>
+  );
+}
+
+// === CRÉDITOS: modelos 3D y texturas de terceros, en tarjetas ===
+function Credits() {
+  return (
+    <section className="credits-band" aria-labelledby="credits-title">
+      <div className="credits-band__head">
+        <div className="eyebrow">Créditos</div>
+        <h3 id="credits-title" className="credits-band__title">Modelos 3D y texturas de la escena</h3>
+      </div>
+      <ul className="credits-grid">
+        {CREDITS.map((c) => (
+          <li key={c.url} className="credit-card">
+            <span className="credit-card__use">{c.use}</span>
+            <a className="credit-card__title" href={c.url} target="_blank" rel="noopener noreferrer">
+              {c.title}<span aria-hidden="true"> ↗</span>
+            </a>
+            <span className="credit-card__author">por {c.author}</span>
+            {c.note && <span className="credit-card__note">{c.note}</span>}
+            <a className="credit-card__license" href={LICENSE_URLS[c.license]} target="_blank" rel="noopener noreferrer">
+              {c.license}
+            </a>
+          </li>
+        ))}
+      </ul>
     </section>
   );
 }
@@ -193,6 +240,7 @@ export function Contact() {
 export function Footer() {
   return (
     <footer>
+      <Allies/>
       <div className="footer-inner">
         <div className="footer-brand-row">
           <div className="footer-brand">KINCHIKA</div>
@@ -222,24 +270,12 @@ export function Footer() {
             <p>Piscina Municipal de Lo Prado<br/>Los Copihues 5797<br/>Lo Prado · RM</p>
           </div>
         </div>
+        {CREDITS.length > 0 && <Credits/>}
         <div className="footer-bottom">
           <span>© {new Date().getFullYear()} Club de Buceo Kinchika</span>
           <span>· — Todos los derechos reservados</span>
           <span>33°26′S · 70°43′W · −100M</span>
         </div>
-        {CREDITS.length > 0 && (
-          <p className="footer-credits">
-            Modelos 3D:{' '}
-            {CREDITS.map((c, i) => (
-              <span key={c.url}>
-                {i > 0 && ' · '}
-                <a href={c.url} target="_blank" rel="noopener noreferrer">“{c.title}”</a> por {c.author}
-              </span>
-            ))}
-            {' '}— licencia <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener noreferrer">CC BY 4.0</a>.
-            Textura de roca: Poly Haven (CC0).
-          </p>
-        )}
       </div>
     </footer>
   );
