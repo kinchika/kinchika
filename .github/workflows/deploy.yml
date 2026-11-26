@@ -1,12 +1,13 @@
-# DESACTIVADO (solo se ejecuta a mano): la cuenta no tiene GitHub Actions disponible
-# por un bloqueo de facturación, y no se paga nada por el sitio.
-# Hoy el sitio se publica compilando (npm run build) y subiendo dist/ a la rama
-# gh-pages; en Settings → Pages el origen es "Deploy from a branch" → gh-pages.
-# Si algún día Actions vuelve a funcionar, se puede reactivar agregando el
-# disparo "push: branches: [main]" y cambiando el origen a "GitHub Actions".
+# Publica el sitio en GitHub Pages en cada push a main.
+# El sitio es un proyecto de Vite: hay que compilarlo (npm run build) y publicar
+# la carpeta dist/, no el código fuente. En Settings → Pages, el origen debe ser
+# "GitHub Actions" y el dominio personalizado se configura ahí (www.kinchika.cl).
+# El repo es de la organización kinchika: para repos públicos, Actions y Pages son gratis.
 name: Publicar en GitHub Pages
 
 on:
+  push:
+    branches: [main]
   workflow_dispatch:
 
 permissions:

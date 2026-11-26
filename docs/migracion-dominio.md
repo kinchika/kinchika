@@ -5,11 +5,15 @@ y el DNS sigue en Ecohosting (servicio "Hosting Gratis ONG").
 
 ## Cómo se publica el sitio
 
-- GitHub Actions no está disponible en la cuenta (bloqueo de facturación; no se paga).
-- El sitio se compila (`npm run build`) y la carpeta `dist/` se sube a la rama `gh-pages`.
-- Settings → Pages → Source = **Deploy from a branch** → `gh-pages` / `(root)`.
-- `public/CNAME` (`www.kinchika.cl`) va dentro de `dist/`; sin él, cada publicación
-  borraría el dominio personalizado.
+- El repo es de la organización **kinchika** (github.com/kinchika/kinchika), no de una
+  cuenta personal. Para repos públicos, GitHub Actions y Pages son gratis.
+- Cada push a `main` ejecuta `.github/workflows/deploy.yml`, que compila con
+  `npm run build` y publica `dist/`.
+- Settings → Pages → Source = **GitHub Actions**. El dominio personalizado
+  (`www.kinchika.cl`) se configura en esa misma página.
+- `public/CNAME` no se usa con Actions; queda por si algún día se vuelve a publicar
+  desde la rama `gh-pages` (Source = Deploy from a branch).
+- El dominio se verifica en la organización: github.com/organizations/kinchika/settings/pages.
 
 ## Respaldo del DNS antes del cambio (consultado el 2026-11-26)
 
@@ -36,9 +40,9 @@ y el DNS sigue en Ecohosting (servicio "Hosting Gratis ONG").
 |---|---|---|
 | kinchika.cl | A | 185.199.108.153, 185.199.109.153, 185.199.110.153, 185.199.111.153 |
 | kinchika.cl | AAAA | 2606:50c0:8000::153, 2606:50c0:8001::153, 2606:50c0:8002::153, 2606:50c0:8003::153 |
-| www.kinchika.cl | CNAME | layonel-gonzales.github.io |
+| www.kinchika.cl | CNAME | kinchika.github.io |
 | mail.kinchika.cl | A | 192.140.58.200 |
-| _github-pages-challenge-layonel-gonzales.kinchika.cl | TXT | (código de verificación de GitHub) |
+| _github-pages-challenge-kinchika.kinchika.cl | TXT | (código de verificación de GitHub) |
 | kinchika.cl | TXT | v=spf1 include:_spf.google.com ip4:192.140.58.200 ~all |
 
 Sin cambios: MX, google-site-verification, _dmarc, default._domainkey, SRV,
