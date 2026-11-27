@@ -171,7 +171,7 @@ export function DescentLine() {
 
   return (
     <group>
-      {/* barco de apoyo en superficie, con bandera de buceo */}
+      {/* barco de apoyo en superficie, con bandera de Chile */}
       <Boat ref={boat} flagRef={flag}/>
       {/* cabo: una cinta delgada que se ve recta en pantalla */}
       <mesh ref={rope} geometry={ropeGeo} frustumCulled={false}>

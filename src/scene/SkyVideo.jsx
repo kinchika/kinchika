@@ -30,6 +30,14 @@ function videoRect(width, height) {
   return { w, h, x: (width - w) / 2 };
 }
 
+/** Rectángulo del video en pantalla (px) para el scroll actual: x, ancho, alto y borde superior. */
+export function skyRect(width, height) {
+  return { ...videoRect(width, height), top: heroTop - window.scrollY };
+}
+
+/** Fracción del alto del video donde está la línea de flotación. */
+export const SKY_WATERLINE = VIDEO_WATERLINE;
+
 /** Posición de la línea de flotación en pantalla (px desde arriba) para el scroll actual. */
 export function waterlineScreenY(width, height) {
   const { h } = videoRect(width, height);

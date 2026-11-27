@@ -54,16 +54,33 @@ function underwaterTint(material) {
   material.needsUpdate = true;
 }
 
-/** Bandera de buceo (roja con franja blanca diagonal): avisa que hay buzos abajo. */
+/**
+ * Bandera de Chile, con las proporciones oficiales: rectángulo 3:2, franja blanca arriba
+ * y roja abajo, cuadro azul del alto de la franja blanca junto al mástil, y estrella
+ * blanca de cinco puntas cuyo diámetro es la mitad del lado del cuadro.
+ */
 function makeFlag() {
+  const W = 300, H = 200, side = H / 2;
   const c = document.createElement('canvas');
-  c.width = 128; c.height = 96;
+  c.width = W; c.height = H;
   const g = c.getContext('2d');
-  g.fillStyle = '#d42020';
-  g.fillRect(0, 0, 128, 96);
-  g.strokeStyle = '#ffffff';
-  g.lineWidth = 18;
-  g.beginPath(); g.moveTo(0, 0); g.lineTo(128, 96); g.stroke();
+  g.fillStyle = '#ffffff';
+  g.fillRect(0, 0, W, side);
+  g.fillStyle = '#d52b1e';
+  g.fillRect(0, side, W, side);
+  g.fillStyle = '#0039a6';
+  g.fillRect(0, 0, side, side);
+  // estrella: 10 vértices alternando radio exterior e interior, con una punta hacia arriba
+  const cx = side / 2, cy = side / 2, rOut = side / 4, rIn = rOut * 0.382;
+  g.fillStyle = '#ffffff';
+  g.beginPath();
+  for (let i = 0; i < 10; i++) {
+    const r = i % 2 ? rIn : rOut;
+    const a = -Math.PI / 2 + (i * Math.PI) / 5;
+    g.lineTo(cx + r * Math.cos(a), cy + r * Math.sin(a));
+  }
+  g.closePath();
+  g.fill();
   const tex = new CanvasTexture(c);
   tex.colorSpace = SRGBColorSpace;
   return tex;
@@ -107,7 +124,7 @@ export const Boat = forwardRef(function Boat({ flagRef, onReady }, ref) {
     <group ref={ref} visible={!!scene}>
       {scene && <primitive object={scene}/>}
       {/* mástil apoyado en la cubierta de popa (cubierta a ~0,91 m sobre el agua),
-          con base y la bandera de buceo arriba */}
+          con base y la bandera de Chile arriba */}
       <mesh position={[-1.6, 0.95, 0.8]}>
         <cylinderGeometry args={[0.07, 0.09, 0.08, 10]}/>
         <meshStandardMaterial color="#c9ccd0" metalness={0.6} roughness={0.35} fog={false}/>
@@ -118,8 +135,9 @@ export const Boat = forwardRef(function Boat({ flagRef, onReady }, ref) {
       </mesh>
       <group ref={flagRef} position={[-1.6, 2.32, 0.8]}>
         <mesh position={[0.3, 0, 0]}>
-          <planeGeometry args={[0.6, 0.45]}/>
-          <meshStandardMaterial map={flagTex} side={DoubleSide} roughness={0.8} emissive="#2a0606" fog={false}/>
+          <planeGeometry args={[0.6, 0.4]}/>
+          <meshStandardMaterial map={flagTex} side={DoubleSide} roughness={0.8}
+            emissive="#ffffff" emissiveMap={flagTex} emissiveIntensity={0.12} fog={false}/>
         </mesh>
       </group>
     </group>

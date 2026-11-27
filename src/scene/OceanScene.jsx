@@ -21,6 +21,7 @@ import { ModelSlot } from './ModelSlot.jsx';
 import { WaterVolume } from './WaterVolume.jsx';
 import { Reef } from './Reef.jsx';
 import { SkyVideo } from './SkyVideo.jsx';
+import { Seagulls } from './Seagulls.jsx';
 import { Bloom, EffectComposer, SMAA, ToneMapping, Vignette } from '@react-three/postprocessing';
 import { ToneMappingMode } from 'postprocessing';
 
@@ -55,6 +56,7 @@ function CameraRig() {
     // cuando la cámara mira hacia arriba y sigue al puntero a la vez
     camera.rotation.order = 'YXZ';
     camera.rotation.set(lookUp - tmp.py * 0.04, -tmp.px * 0.06, roll);
+
 
     waterColor(p, tmp.c);
     if (scene.background?.isColor) scene.background.copy(tmp.c);
@@ -106,6 +108,7 @@ function World({ mobile }) {
       <MarineSnow count={Math.round(2400 * f)}/>
       <Bubbles count={Math.round(200 * f)}/>
       <SkyVideo/>
+      <Seagulls mobile={mobile}/>
       {/* en celular solo información, peces y fondo: sin barco, cuerda ni buzo */}
       {!mobile && <DescentLine/>}
 
@@ -123,7 +126,7 @@ function World({ mobile }) {
         color="#d2d8de" back="#3a4652" emissive="#0c1218" metalness={0.85} roughness={0.22}
         tint="#a9b9cc" modelUrl={FISH_MODELS.reineta}/>
 
-      <Jellyfish count={mobile ? 6 : 10}/>
+      <Jellyfish count={mobile ? 12 : 20}/>
 
       {!mobile && MODELS.map((m) => <ModelSlot key={m.id} {...m}/>)}
     </>

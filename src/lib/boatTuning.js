@@ -6,7 +6,7 @@
 import { MODELS } from '../assets.config.js';
 
 export const boatTuning = {
-  diverRatio: 3,    // largo del barco = N veces lo que mide el buzo en pantalla
+  diverRatio: 4.2,  // largo del barco = N veces lo que mide el buzo en pantalla
   maxWidthPct: 50,  // tope: % del ancho de la pantalla
   offsetX: 7,       // px: + mueve el barco a la derecha (la cuerda queda en su lugar)
   offsetY: -21,     // px: + sube el barco sobre el agua (la cuerda lo acompaña)
