@@ -34,7 +34,7 @@ y el DNS sigue en Ecohosting (servicio "Hosting Gratis ONG").
 | kinchika.cl | CAA | (no hay) | — |
 | kinchika.cl | AAAA | (no hay) | — |
 
-## DNS final esperado
+## DNS final (aplicado y verificado el 2026-11-27)
 
 | Nombre | Tipo | Valor |
 |---|---|---|
@@ -44,6 +44,19 @@ y el DNS sigue en Ecohosting (servicio "Hosting Gratis ONG").
 | mail.kinchika.cl | A | 192.140.58.200 |
 | _github-pages-challenge-kinchika.kinchika.cl | TXT | (código de verificación de GitHub) |
 | kinchika.cl | TXT | v=spf1 include:_spf.google.com ip4:192.140.58.200 ~all |
+
+Borrados: `kinchika.kinchika.cl` (A 216.239.32.21, error de tipeo) y
+`validaciongoogle.kinchi.ka.cl.kinchika.cl` (TXT basura).
+
+HTTPS: certificado de GitHub (Let's Encrypt) para `kinchika.cl` y `www.kinchika.cl`,
+renovación automática. "Enforce HTTPS" activado.
+
+Nota de cPanel: todos los registros con el mismo nombre y tipo deben tener el mismo
+TTL. Para cambiar el TTL de un grupo (por ejemplo los A de la raíz), hay que dejar un
+solo registro, editarlo y luego agregar los demás.
+
+No borrar nunca `_github-pages-challenge-kinchika.kinchika.cl`: GitHub lo revisa
+periódicamente para mantener el dominio verificado.
 
 Sin cambios: MX, google-site-verification, _dmarc, default._domainkey, SRV,
 _acme-challenge, y los subdominios de cPanel (ftp, webmail, webdisk, whm, autodiscover,
