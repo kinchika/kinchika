@@ -58,7 +58,7 @@ export const MODELS = [
     follow: [6, 99],
     followOffsetM: 0.5,
     position: [4.2, -11],
-    height: 3.6,
+    height: 2.6,
     // el modelo nada hacia +Z con la espalda hacia +Y: se pone de cabeza (descenso)
     // y se gira en 3/4 para ver el cuerpo y las aletas
     rotation: [Math.PI / 2 + 0.35, 0.6, 0, 'YXZ'],

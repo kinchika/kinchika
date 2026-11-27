@@ -7,6 +7,9 @@ Convierte el buzo autónomo (modelo "Diver" de ucdavisterc, CC BY 4.0) en un apn
      a lo largo de la aleta, tanto en la pose base como en toda la animación.
   3. Suaviza la flexión de la hoja: la animación original dobla cada segmento de una
      aleta corta; en una larga esa curva se acumula y la punta queda como un gancho.
+  4. Cambia la patada de buceo autónomo por una de apnea: el movimiento nace en la
+     cadera, las rodillas se doblan poco y los tobillos van extendidos (la aleta
+     continúa la línea de la pierna).
 
 No usa dependencias: solo Python 3.8 o superior.
 
@@ -31,6 +34,13 @@ LARGO_ALETA = 2.5   # el eje X local del hueso apunta a lo largo de la aleta
 # Segmentos de la hoja cuyo doblez se reduce, y cuánto se conserva del doblez original
 SEGMENTOS_HOJA = ['_fin_2_', '_fin_3_', '_fin_4_', '_fin_5_']
 FLEXION = 0.5
+# Patada de apnea
+CADERAS = ['l_leg_02', 'r_leg_062']
+RODILLAS = ['l_knee_03', 'r_knee_063']
+TOBILLOS = ['l_ankle_04', 'r_ankle_064']
+CADERA = 1.35     # amplitud del movimiento de cadera (1 = original)
+RODILLA = 0.45    # parte del doblez de rodilla que se conserva (0 = pierna recta)
+TOBILLO = 0.3     # parte del movimiento de tobillo que se conserva, en torno al pie más extendido
 
 
 def leer_glb(ruta):
@@ -205,6 +215,74 @@ def suavizar_flexion(gltf, binario):
     print(f'Flexión de la hoja: {total} segmentos al {FLEXION:.0%} del doblez original')
 
 
+def qmul(a, b):
+    ax, ay, az, aw = a
+    bx, by, bz, bw = b
+    return [aw * bx + ax * bw + ay * bz - az * by,
+            aw * by - ax * bz + ay * bw + az * bx,
+            aw * bz + ax * by - ay * bx + az * bw,
+            aw * bw - ax * bx - ay * by - az * bz]
+
+
+def qconj(q):
+    return [-q[0], -q[1], -q[2], q[3]]
+
+
+def qangulo(a, b):
+    import math
+    d = abs(sum(x * y for x, y in zip(a, b)))
+    return 2 * math.acos(min(1.0, d))
+
+
+def promedio(qs):
+    ref, acc = qs[0], [0.0, 0.0, 0.0, 0.0]
+    for q in qs:
+        signo = 1 if sum(x * y for x, y in zip(ref, q)) >= 0 else -1
+        acc = [a + signo * c for a, c in zip(acc, q)]
+    n = sum(c * c for c in acc) ** 0.5
+    return [c / n for c in acc]
+
+
+def reemplazar_rotaciones(gltf, binario, huesos, transformar):
+    nombres = [n.get('name') for n in gltf['nodes']]
+    for anim in gltf.get('animations', []):
+        for canal in anim['channels']:
+            t = canal['target']
+            if t['path'] != 'rotation' or nombres[t['node']] not in huesos:
+                continue
+            sampler = anim['samplers'][canal['sampler']]
+            valores = leer_accessor(gltf, binario, sampler['output'])
+            reposo = gltf['nodes'][t['node']].get('rotation', [0, 0, 0, 1])
+            nuevos = transformar(valores, reposo)
+            viejo = gltf['accessors'][sampler['output']]
+            nuevo = {'bufferView': agregar_datos(gltf, binario, [c for q in nuevos for c in q], 'f'),
+                     'componentType': 5126, 'count': viejo['count'], 'type': 'VEC4'}
+            gltf['accessors'].append(nuevo)
+            sampler['output'] = len(gltf['accessors']) - 1
+
+
+def patada_de_apnea(gltf, binario):
+    # cadera: se amplía la desviación de cada cuadro respecto de la pose media
+    def cadera(qs, reposo):
+        media = promedio(qs)
+        return [qmul(media, slerp([0, 0, 0, 1], qmul(qconj(media), q), CADERA)) for q in qs]
+
+    # rodilla: se acerca a la pierna recta (la pose de reposo del modelo)
+    def rodilla(qs, reposo):
+        return [slerp(reposo, q, RODILLA) for q in qs]
+
+    # tobillo: se acerca al cuadro con el pie más extendido (el más lejano al reposo,
+    # que tiene el pie a 90°)
+    def tobillo(qs, reposo):
+        extendido = max(qs, key=lambda q: qangulo(reposo, q))
+        return [slerp(extendido, q, TOBILLO) for q in qs]
+
+    reemplazar_rotaciones(gltf, binario, CADERAS, cadera)
+    reemplazar_rotaciones(gltf, binario, RODILLAS, rodilla)
+    reemplazar_rotaciones(gltf, binario, TOBILLOS, tobillo)
+    print(f'Patada de apnea: cadera x{CADERA:g}, rodilla al {RODILLA:.0%}, tobillo al {TOBILLO:.0%}')
+
+
 def compactar(gltf, binario):
     """Reescribe el binario solo con los bufferViews que se siguen usando."""
     usados = {a['bufferView'] for a in gltf['accessors'] if 'bufferView' in a}
@@ -239,6 +317,7 @@ def main():
     quitar_equipo(gltf, binario)
     alargar_aletas(gltf, binario)
     suavizar_flexion(gltf, binario)
+    patada_de_apnea(gltf, binario)
     binario = compactar(gltf, binario)
     escribir_glb(salida, gltf, binario)
     print(f'Listo: {salida}')
