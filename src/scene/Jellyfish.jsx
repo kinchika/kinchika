@@ -3,6 +3,9 @@
  * Campana translúcida (más luminosa en los bordes, como un domo de gelatina),
  * con canales radiales, gónadas, borde festoneado y un pulso de luz que baja;
  * brazos orales fruncidos y tentáculos ondulantes que se apagan hacia la punta.
+ *
+ * Cada medusa tiene su propio ritmo de pulso, deriva, giro e impulso: al contraer
+ * la campana sube un poco y luego se hunde despacio, como las reales.
  */
 import { useEffect, useMemo, useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
@@ -13,11 +16,12 @@ import {
 import { depthState, MOTION } from '../lib/depth.js';
 import { mToY, smoothstep } from './palette.js';
 
-const PULSE_SPEED = 1.6;
+const rnd = (a, b) => a + Math.random() * (b - a);
 
 const bellVertex = /* glsl */`
   uniform float uTime;
   uniform float uSeed;
+  uniform float uPulse;
   varying vec3 vN;
   varying vec3 vV;
   varying vec3 vP;
@@ -25,7 +29,7 @@ const bellVertex = /* glsl */`
   void main() {
     vec3 p = position;
     float prof = uv.y;                                  // 0 en el ápice, 1 en el borde
-    float pulse = sin(uTime * ${PULSE_SPEED.toFixed(2)} + uSeed * 6.283);
+    float pulse = sin(uTime * uPulse + uSeed * 6.283);
     float k = smoothstep(0.2, 1.0, prof);
     float ang = atan(p.z, p.x);
     float lappets = 1.0 + 0.04 * cos(ang * 16.0) * smoothstep(0.8, 1.0, prof);
@@ -45,6 +49,7 @@ const bellFragment = /* glsl */`
   uniform float uOpacity;
   uniform float uTime;
   uniform float uSeed;
+  uniform float uPulse;
   varying vec3 vN;
   varying vec3 vV;
   varying vec3 vP;
@@ -60,7 +65,7 @@ const bellFragment = /* glsl */`
     float gonad = smoothstep(0.12, 0.0, abs(prof - 0.42)) * pow(abs(sin(ang * 2.0)), 4.0);
     float apex = smoothstep(0.25, 0.0, prof) * 0.3;
     // onda de luz que recorre la campana hacia el borde con cada pulso
-    float wave = 0.5 + 0.5 * sin(uTime * ${PULSE_SPEED.toFixed(2)} + uSeed * 6.283 - prof * 3.5);
+    float wave = 0.5 + 0.5 * sin(uTime * uPulse + uSeed * 6.283 - prof * 3.5);
     float glow = 0.025 + 0.85 * fres + 0.35 * canals * (0.6 + 0.4 * wave)
       + (0.55 + 0.45 * lappet) * rimBand * (0.5 + 0.5 * wave) + 0.45 * gonad + apex;
     vec3 col = mix(uColor, uRim, clamp(rimBand * 0.8 + gonad * 0.6, 0.0, 1.0));
@@ -129,13 +134,13 @@ function makeBellGeometry() {
   return new LatheGeometry(pts, 56);
 }
 
-function Jelly({ seed, x, z, depthM, scale, color, rim, tilt }) {
+function Jelly({ seed, x, z, depthM, scale, color, rim, tilt, motion }) {
   const group = useRef();
   const lineMat = useRef();
   const bellGeo = useMemo(makeBellGeometry, []);
   const armGeo = useMemo(() => new PlaneGeometry(0.38, ARM_LEN, 2, 40).translate(0, -ARM_LEN / 2, 0), []);
   const uniforms = useMemo(() => ({
-    uTime: { value: 0 }, uSeed: { value: seed },
+    uTime: { value: 0 }, uSeed: { value: seed }, uPulse: { value: motion.pulse },
     uColor: { value: new Color(color) }, uRim: { value: new Color(rim) }, uOpacity: { value: 0 },
   }), [seed, color, rim]);
   // materiales creados aquí (no como JSX) para que compartan el MISMO objeto de uniforms:
@@ -185,15 +190,24 @@ function Jelly({ seed, x, z, depthM, scale, color, rim, tilt }) {
     if (!group.current) return;
     group.current.visible = fade > 0.001;
     if (!group.current.visible) return;
+    // deriva propia: dos ondas con frecuencias al azar en cada eje
+    const m = motion;
+    const ph = t * m.pulse + seed * 6.283;
+    // impulso: sube rápido al contraer la campana y se hunde despacio el resto del ciclo
+    const cycle = ((ph % 6.283) + 6.283) % 6.283 / 6.283;
+    const thrust = cycle < 0.3 ? smoothstep(0, 0.3, cycle) : 1 - smoothstep(0.3, 1, cycle);
     group.current.position.set(
-      x + Math.sin(t * 0.09 + seed * 9) * 3,
-      baseY + Math.sin(t * 0.35 + seed * 5) * 1.6,
-      z,
+      x + Math.sin(t * m.fx1 + m.p1) * m.ax + Math.sin(t * m.fx2 + m.p2) * m.ax * 0.4,
+      baseY + Math.sin(t * m.fy + m.p3) * m.ay + thrust * m.thrust * scale,
+      z + Math.sin(t * m.fz + m.p4) * m.az,
     );
-    group.current.rotation.set(tilt[0] + Math.sin(t * 0.3 + seed * 4) * 0.08, t * 0.05 + seed * 6, tilt[1]);
+    group.current.rotation.set(
+      tilt[0] + Math.sin(t * m.fTilt + m.p2) * m.tiltAmp,
+      seed * 6 + t * m.spin,
+      tilt[1] + Math.cos(t * m.fTilt * 0.8 + m.p3) * m.tiltAmp,
+    );
 
     // tentáculos: cuelgan del borde, siguen el pulso con retraso y ondulan
-    const ph = t * PULSE_SPEED + seed * 6.283;
     const arr = tent.geometry.attributes.position.array;
     let k = 0;
     for (const it of tent.items) {
@@ -231,17 +245,28 @@ function Jelly({ seed, x, z, depthM, scale, color, rim, tilt }) {
   );
 }
 
-export function Jellyfish({ count = 9 }) {
+export function Jellyfish({ count = 20 }) {
   const jellies = useMemo(() => Array.from({ length: count }, (_, i) => {
     const [color, rim] = PALETTE[i % PALETTE.length];
     return {
       seed: Math.random(),
-      x: (i % 2 ? 1 : -1) * (14 + Math.random() * 16),
-      z: -14 - Math.random() * 40,
-      depthM: 72 + (i / count) * 26 + Math.random() * 3,
-      scale: 0.9 + Math.random() * 1.4,
+      x: (i % 2 ? 1 : -1) * rnd(8, 34),
+      z: rnd(-62, -10),
+      depthM: 70 + (i / count) * 28 + rnd(0, 3),
+      // a escala de la persona: una medusa grande de profundidad, no un gigante
+      scale: rnd(0.45, 1.15),
       color, rim,
-      tilt: [(Math.random() - 0.5) * 0.5, (Math.random() - 0.5) * 0.5],
+      tilt: [rnd(-0.25, 0.25), rnd(-0.25, 0.25)],
+      motion: {
+        pulse: rnd(1.1, 2.3),                       // ritmo de la campana
+        fx1: rnd(0.05, 0.14), fx2: rnd(0.15, 0.3), ax: rnd(1.5, 4),
+        fy: rnd(0.15, 0.4), ay: rnd(0.6, 1.8),
+        fz: rnd(0.04, 0.12), az: rnd(1, 3.5),
+        thrust: rnd(0.25, 0.6),
+        spin: rnd(0.02, 0.09) * (Math.random() < 0.5 ? -1 : 1),
+        fTilt: rnd(0.2, 0.45), tiltAmp: rnd(0.05, 0.14),
+        p1: rnd(0, 6.283), p2: rnd(0, 6.283), p3: rnd(0, 6.283), p4: rnd(0, 6.283),
+      },
     };
   }), [count]);
   return jellies.map((j, i) => <Jelly key={i} {...j}/>);

@@ -126,7 +126,7 @@ function World({ mobile }) {
         color="#d2d8de" back="#3a4652" emissive="#0c1218" metalness={0.85} roughness={0.22}
         tint="#a9b9cc" modelUrl={FISH_MODELS.reineta}/>
 
-      <Jellyfish count={mobile ? 6 : 10}/>
+      <Jellyfish count={mobile ? 12 : 20}/>
 
       {!mobile && MODELS.map((m) => <ModelSlot key={m.id} {...m}/>)}
     </>
