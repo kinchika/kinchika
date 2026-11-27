@@ -21,6 +21,8 @@ import { ModelSlot } from './ModelSlot.jsx';
 import { WaterVolume } from './WaterVolume.jsx';
 import { Reef } from './Reef.jsx';
 import { SkyVideo } from './SkyVideo.jsx';
+import { Seagulls } from './Seagulls.jsx';
+import { Immersion, immersionFx } from './Immersion.jsx';
 import { Bloom, EffectComposer, SMAA, ToneMapping, Vignette } from '@react-three/postprocessing';
 import { ToneMappingMode } from 'postprocessing';
 
@@ -55,6 +57,19 @@ function CameraRig() {
     // cuando la cámara mira hacia arriba y sigue al puntero a la vez
     camera.rotation.order = 'YXZ';
     camera.rotation.set(lookUp - tmp.py * 0.04, -tmp.px * 0.06, roll);
+
+    // sacudón al entrar al agua: baja un poco y oscila, amortiguado
+    const kick = immersionFx.kick;
+    if (kick > 0.002) {
+      const osc = Math.sin(state.clock.elapsedTime * 15) * kick;
+      camera.position.y -= kick * 0.45;
+      camera.position.x += osc * 0.06;
+      camera.rotation.x += kick * 0.035 + osc * 0.01;
+      camera.rotation.z += osc * 0.012;
+      immersionFx.kick *= Math.exp(-dt * 3.2);
+    } else {
+      immersionFx.kick = 0;
+    }
 
     waterColor(p, tmp.c);
     if (scene.background?.isColor) scene.background.copy(tmp.c);
@@ -106,6 +121,8 @@ function World({ mobile }) {
       <MarineSnow count={Math.round(2400 * f)}/>
       <Bubbles count={Math.round(200 * f)}/>
       <SkyVideo/>
+      <Seagulls mobile={mobile}/>
+      <Immersion mobile={mobile}/>
       {/* en celular solo información, peces y fondo: sin barco, cuerda ni buzo */}
       {!mobile && <DescentLine/>}
 

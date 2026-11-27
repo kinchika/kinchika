@@ -68,6 +68,70 @@ export function toggleAudio() {
 
 export function isPlaying() { return !!audio && !audio.paused; }
 
+/**
+ * Chapuzón al entrar al agua, sintetizado (sin archivos): golpe grave, ruido de
+ * agua que se cierra hacia los graves y unas burbujas. Solo suena si el sonido
+ * ambiente está activado.
+ */
+export function playSplash() {
+  if (!ctx || !isPlaying()) return;
+  const now = ctx.currentTime;
+  const out = ctx.createGain();
+  out.gain.value = 0.9;
+  out.connect(ctx.destination);
+  const env = (g, peak, attack, release) => {
+    g.gain.setValueAtTime(0.0001, now);
+    g.gain.exponentialRampToValueAtTime(peak, now + attack);
+    g.gain.exponentialRampToValueAtTime(0.0001, now + attack + release);
+  };
+
+  // ruido de agua: ráfaga que pasa de agudo a grave, como el agua cerrándose sobre la cabeza
+  const len = 1.3;
+  const buf = ctx.createBuffer(1, Math.floor(ctx.sampleRate * len), ctx.sampleRate);
+  const data = buf.getChannelData(0);
+  for (let i = 0; i < data.length; i++) data[i] = Math.random() * 2 - 1;
+  const noise = ctx.createBufferSource();
+  noise.buffer = buf;
+  const band = ctx.createBiquadFilter();
+  band.type = 'bandpass';
+  band.Q.value = 0.8;
+  band.frequency.setValueAtTime(2600, now);
+  band.frequency.exponentialRampToValueAtTime(260, now + 1.0);
+  const ng = ctx.createGain();
+  env(ng, 0.32, 0.025, 1.1);
+  noise.connect(band).connect(ng).connect(out);
+  noise.start(now);
+  noise.stop(now + len);
+
+  // golpe grave del cuerpo entrando al agua
+  const thump = ctx.createOscillator();
+  thump.type = 'sine';
+  thump.frequency.setValueAtTime(150, now);
+  thump.frequency.exponentialRampToValueAtTime(45, now + 0.3);
+  const tg = ctx.createGain();
+  env(tg, 0.35, 0.01, 0.35);
+  thump.connect(tg).connect(out);
+  thump.start(now);
+  thump.stop(now + 0.4);
+
+  // burbujas: pequeños silbidos que suben de tono
+  for (let i = 0; i < 9; i++) {
+    const at = now + 0.12 + Math.random() * 0.8;
+    const o = ctx.createOscillator();
+    o.type = 'sine';
+    const f0 = 350 + Math.random() * 500;
+    o.frequency.setValueAtTime(f0, at);
+    o.frequency.exponentialRampToValueAtTime(f0 * 2.2, at + 0.06);
+    const g = ctx.createGain();
+    g.gain.setValueAtTime(0.0001, at);
+    g.gain.exponentialRampToValueAtTime(0.05 + Math.random() * 0.05, at + 0.008);
+    g.gain.exponentialRampToValueAtTime(0.0001, at + 0.07);
+    o.connect(g).connect(out);
+    o.start(at);
+    o.stop(at + 0.08);
+  }
+}
+
 export function onAudioChange(fn) {
   subs.add(fn);
   return () => subs.delete(fn);
