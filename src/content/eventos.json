@@ -6,7 +6,7 @@
     "place": "Quintay · V Región",
     "desc": "Jornada de recolección de residuos costeros junto a la junta de vecinos local.",
     "level": "Principiante",
-    "cupos": 11,
+    "cupos": 12,
     "cuposMax": 25,
     "img": "img/eventos/limpieza-playa.svg",
     "visible": true
