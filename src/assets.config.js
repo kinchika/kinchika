@@ -41,7 +41,7 @@ export const INTERLUDES = {
  *  height     alto deseado en unidades del mundo (se normaliza el modelo)
  *  rotationY  giro en radianes
  *  rotation   [x, y, z, orden] giro completo (reemplaza a rotationY)
- *  bubbles    si es true, suelta burbujas de regulador desde la cabeza (buzo con tanque)
+ *  bubbles    si es true, suelta burbujas de regulador desde la cabeza (solo para buzo con tanque)
  *  useLane    si es true, en pantallas anchas se ubica en el carril libre a la derecha del texto
  *  belowBoat  si es true, nunca sube por encima de una línea bajo el barco de la portada
  *  turnOnAscent  si es true, al hacer scroll hacia arriba el modelo da una voltereta
@@ -51,20 +51,22 @@ export const INTERLUDES = {
 export const MODELS = [
   {
     id: 'buzo',
-    src: 'models/buzo.glb',
+    // apneísta: el buzo original sin equipo autónomo y con aletas largas
+    // (se genera con pipeline/apneista/convertir_buzo.py)
+    src: 'models/apneista.glb',
     depthM: 20,
     follow: [6, 99],
     followOffsetM: 0.5,
     position: [4.2, -11],
     height: 3.6,
     // el modelo nada hacia +Z con la espalda hacia +Y: se pone de cabeza (descenso)
-    // y se gira en 3/4 para ver el tanque y las aletas
+    // y se gira en 3/4 para ver el cuerpo y las aletas
     rotation: [Math.PI / 2 + 0.35, 0.6, 0, 'YXZ'],
     turnOnAscent: true,
     // en pantallas anchas, nada por el carril libre a la derecha del texto
     useLane: true,
-    // exhala burbujas por el regulador cada ~4,5 s
-    bubbles: true,
+    // en apnea no se exhala durante el descenso: sin burbujas
+    bubbles: false,
     // no sube más allá de una línea bajo el casco del barco de la portada
     belowBoat: true,
     animation: 'auto',
@@ -77,7 +79,7 @@ export const MODELS = [
  *   use      para qué se usa en la web
  */
 export const CREDITS = [
-  { use: 'Buzo', title: 'Diver', author: 'ucdavisterc', url: 'https://skfb.ly/oIOZJ', license: 'CC BY 4.0' },
+  { use: 'Apneísta', title: 'Diver', author: 'ucdavisterc', url: 'https://skfb.ly/oIOZJ', license: 'CC BY 4.0', note: 'modificado: sin equipo autónomo y con aletas largas' },
   { use: 'Barco', title: 'Motor Yacht', author: 'gogiart', url: 'https://skfb.ly/pETVG', license: 'CC BY 4.0', note: 'casco repintado y simplificado' },
   { use: 'Jurel', title: 'Atlantic Mackerel (Animated and Game-ready)', author: 'Ishxxn', url: 'https://skfb.ly/pMyHY', license: 'CC BY 4.0' },
   { use: 'Anchoveta', title: 'Sardine', author: 'Drake', url: 'https://skfb.ly/6vYqN', license: 'CC BY 4.0' },

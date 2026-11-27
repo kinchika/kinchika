@@ -94,6 +94,20 @@ Para un modelo hecho a mano en Blender, expórtalo y procésalo igual:
   --tipo pez --entrada C:\ruta\mi-pez.glb --salida public\models\jurel.glb
 ```
 
+## 3b. Apneísta (buzo sin tanque)
+
+El sitio muestra un **apneísta**: el modelo "Diver" (ucdavisterc, CC BY 4.0) sin el equipo
+autónomo (tanque, chaleco, regulador, mangueras, snorkel) y con aletas largas de apnea.
+Se genera con un script de Python sin dependencias (no necesita Blender):
+
+```powershell
+git show 6f1ae14:public/models/buzo.glb > pipeline\out\buzo.glb
+python pipeline\apneista\convertir_buzo.py pipeline\out\buzo.glb public\models\apneista.glb
+```
+
+En el script se ajustan el largo de las aletas (`LARGO_ALETA`) y cuánto flexa la hoja
+(`FLEXION`). El sitio carga `models/apneista.glb` (ver `src/assets.config.js`).
+
 ## 4. Ver y ajustar
 
 ```powershell
