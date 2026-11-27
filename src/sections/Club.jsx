@@ -1,28 +1,30 @@
 /* Resultados, directiva, lugar, contacto y pie de página */
 import { useState } from 'react';
-import { ALLIES, DIRECTIVAS, RESULTS } from '../data/kinchika.js';
+import { ALLIES, CONTACT, DIRECTIVAS, NAV, RESULTS, SECTIONS, isVisible } from '../lib/content.js';
+import { Rich } from '../components/Rich.jsx';
 import { IconCamera, IconPin, IconWhatsApp } from '../components/Icons.jsx';
 import { CREDITS, LICENSE_URLS } from '../assets.config.js';
 
 // === RESULTS ===
 export function Results() {
-  const keys = Object.keys(RESULTS);
-  const [sel, setSel] = useState(keys[0]);
+  const [sel, setSel] = useState(0);
   const r = RESULTS[sel];
   const podiumClass = (pos) => pos === 1 ? 'gold' : pos === 2 ? 'silver' : pos === 3 ? 'bronze' : '';
 
+  if (!isVisible('resultados') || !r) return null;
+  const head = SECTIONS.resultados;
   return (
     <section id="resultados" className="section section--wide">
       <div className="container">
         <div className="section__head">
-          <div className="eyebrow">Marcador oficial</div>
-          <h2 className="heading">Resultados de eventos</h2>
-          <p className="lead">Registro histórico de competencias y encuentros del club Kinchika en colaboración con la federación FEDESUB.</p>
+          <div className="eyebrow">{head.etiqueta}</div>
+          <h2 className="heading">{head.titulo}</h2>
+          <Rich className="lead" text={head.bajada}/>
         </div>
 
         <div className="results-selector">
-          <select value={sel} onChange={e => setSel(e.target.value)} aria-label="Elegir competencia">
-            {keys.map(k => <option key={k} value={k}>{RESULTS[k].name}</option>)}
+          <select value={sel} onChange={e => setSel(+e.target.value)} aria-label="Elegir competencia">
+            {RESULTS.map((x, i) => <option key={i} value={i}>{x.name}</option>)}
           </select>
         </div>
 
@@ -42,8 +44,8 @@ export function Results() {
             </div>
           </div>
           <div className="results-list">
-            {r.rows.map(row => (
-              <div key={row.pos} className={'result-row ' + podiumClass(row.pos)}>
+            {r.rows.map((row, i) => (
+              <div key={i} className={'result-row ' + podiumClass(Number(row.pos))}>
                 <div className="pos">{String(row.pos).padStart(2, '0')}</div>
                 <div>
                   <div className="name">{row.name}</div>
@@ -62,18 +64,20 @@ export function Results() {
 
 // === DIRECTIVA ===
 export function Directiva() {
-  const years = Object.keys(DIRECTIVAS).sort().reverse();
+  const years = DIRECTIVAS.map((x) => x.anio);
   const [year, setYear] = useState(years[0]);
-  const d = DIRECTIVAS[year];
+  const d = DIRECTIVAS.find((x) => x.anio === year);
 
+  if (!isVisible('directiva') || !d) return null;
+  const head = SECTIONS.directiva;
   return (
     <section id="directiva" className="section section--wide">
       <div className="container">
         <div className="section__head">
-          <div className="eyebrow">Historia institucional</div>
-          <h2 className="heading">Directiva del club</h2>
-          <p className="lead text--desktop">Registro permanente de quienes han liderado el Club Kinchika año a año, velando por el crecimiento y la transparencia de nuestra organización.</p>
-          <p className="lead text--mobile">Registro histórico de directivas del Club Kinchika.</p>
+          <div className="eyebrow">{head.etiqueta}</div>
+          <h2 className="heading">{head.titulo}</h2>
+          <Rich className="lead text--desktop" text={head.bajada}/>
+          <Rich className="lead text--mobile" text={head.bajadaMovil || head.bajada}/>
         </div>
 
         <div className="year-tabs">
@@ -104,33 +108,36 @@ export function Directiva() {
 
 // === LOCATION ===
 export function Location() {
+  if (!isVisible('lugar')) return null;
+  const head = SECTIONS.lugar;
+  const l = CONTACT.lugar;
   return (
     <section id="lugar" className="section section--wide">
       <div className="container">
         <div className="section__head">
-          <div className="eyebrow">Dónde entrenamos</div>
-          <h2 className="heading">Nuestro lugar</h2>
-          <p className="lead">Piscina municipal de Lo Prado — nuestro centro de entrenamiento.</p>
+          <div className="eyebrow">{head.etiqueta}</div>
+          <h2 className="heading">{head.titulo}</h2>
+          <Rich className="lead" text={head.bajada}/>
         </div>
         <div className="location-card">
           <div className="location-info">
-            <h3>Piscina Municipal de Lo Prado</h3>
-            <div className="address">Los Copihues 5797</div>
-            <div className="city">Lo Prado · Región Metropolitana · Chile</div>
-            <p className="text--desktop">Espacio que hemos transformado en nuestro centro de entrenamiento gracias al apoyo de la municipalidad. Aquí desarrollamos las sesiones de nado, acondicionamiento y técnica de apnea.</p>
-            <p className="text--mobile">Nuestro centro de entrenamiento para nado, acondicionamiento y técnica de apnea.</p>
-            <a href="https://maps.google.com/?q=Los+Copihues+5797,+Lo+Prado" target="_blank" rel="noopener" className="btn btn--outline">Ver en Google Maps →</a>
+            <h3>{l.nombre}</h3>
+            <div className="address">{l.direccion}</div>
+            <div className="city">{[l.comuna, l.region, l.pais].filter(Boolean).join(' · ')}</div>
+            <Rich className="text--desktop" text={l.texto}/>
+            <Rich className="text--mobile" text={l.textoMovil}/>
+            <a href={l.mapsUrl} target="_blank" rel="noopener" className="btn btn--outline">Ver en Google Maps →</a>
           </div>
           <div className="location-map">
             <iframe
-              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3329.2921497651396!2d-70.72124791200032!3d-33.44169432844727!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x9662c476226cdf89%3A0x35845e136ef8434c!2sLos%20Copihues%205797%2C%20Lo%20Prado%2C%20Regi%C3%B3n%20Metropolitana!5e0!3m2!1ses-419!2scl!4v1778029852080!5m2!1ses-419!2scl"
+              src={l.mapaEmbedUrl}
               width="100%"
               height="100%"
               style={{border: 0, display: 'block'}}
               allowFullScreen=""
               loading="lazy"
               referrerPolicy="no-referrer-when-downgrade"
-              title="Ubicación Kinchika — Los Copihues 5797, Lo Prado"
+              title={`Ubicación Kinchika — ${l.direccion}, ${l.comuna}`}
             />
           </div>
         </div>
@@ -140,34 +147,40 @@ export function Location() {
 }
 
 // === CONTACT ===
+const waLink = () => `https://wa.me/${CONTACT.whatsapp.replace(/\D/g, '')}`;
+const igLink = () => `https://www.instagram.com/${CONTACT.instagramUsuario.replace(/^@/, '')}/`;
+
 export function Contact() {
+  if (!isVisible('contacto')) return null;
+  const head = SECTIONS.contacto;
+  const c = CONTACT;
   return (
     <section id="contacto" className="section section--wide">
       <div className="container">
         <div className="section__head">
-          <div className="eyebrow">Contacto</div>
-          <h2 className="heading">Sumérgete con nosotros</h2>
-          <p className="lead">Nuevos integrantes son bienvenidos. Escríbenos o pásate por la piscina un martes, miércoles o jueves.</p>
+          <div className="eyebrow">{head.etiqueta}</div>
+          <h2 className="heading">{head.titulo}</h2>
+          <Rich className="lead" text={head.bajada}/>
         </div>
 
         <div className="contact-grid">
           <div className="contact-card">
             <div className="contact-icon"><IconWhatsApp/></div>
             <div className="label">WhatsApp</div>
-            <div className="value"><a href="https://wa.me/56967508503" target="_blank" rel="noopener">+56 9 6750 8503</a></div>
-            <div className="sub">Francisco Reyes · Presidente</div>
+            <div className="value"><a href={waLink()} target="_blank" rel="noopener">{c.whatsapp}</a></div>
+            <div className="sub">{c.whatsappNombre}</div>
           </div>
           <div className="contact-card">
             <div className="contact-icon"><IconPin/></div>
             <div className="label">Ubicación</div>
-            <div className="value">Los Copihues 5797</div>
-            <div className="sub">Lo Prado · Región Metropolitana</div>
+            <div className="value">{c.lugar.direccion}</div>
+            <div className="sub">{[c.lugar.comuna, c.lugar.region].filter(Boolean).join(' · ')}</div>
           </div>
           <div className="contact-card">
             <div className="contact-icon"><IconCamera/></div>
             <div className="label">Instagram</div>
-            <div className="value"><a href="https://www.instagram.com/clubdebuceo.kinchika/" target="_blank" rel="noopener">@clubdebuceo.kinchika</a></div>
-            <div className="sub">Síguenos para novedades</div>
+            <div className="value"><a href={igLink()} target="_blank" rel="noopener">@{c.instagramUsuario.replace(/^@/, '')}</a></div>
+            <div className="sub">{c.instagramTexto}</div>
           </div>
         </div>
       </div>
@@ -180,11 +193,13 @@ export function Contact() {
 const ALLY_GROUP = [...ALLIES, ...ALLIES, ...ALLIES];
 
 function Allies() {
+  if (!isVisible('aliados') || ALLIES.length === 0) return null;
+  const head = SECTIONS.aliados;
   return (
     <section className="allies-band" aria-label="Aliados">
       <div className="footer-inner allies-band__head">
-        <div className="eyebrow">Aliados</div>
-        <h2 className="allies-band__title">Nos apoyan</h2>
+        <div className="eyebrow">{head.etiqueta}</div>
+        <h2 className="allies-band__title">{head.titulo}</h2>
       </div>
       <div className="allies-carousel">
         {/* dos grupos idénticos que se desplazan medio ancho: el bucle no tiene costura.
@@ -237,6 +252,8 @@ function Credits() {
 }
 
 // === FOOTER ===
+const FOOTER_NAV = ['#mision', '#historia', '#eventos', '#contacto'];
+
 export function Footer() {
   return (
     <footer>
@@ -244,30 +261,28 @@ export function Footer() {
       <div className="footer-inner">
         <div className="footer-brand-row">
           <div className="footer-brand">KINCHIKA</div>
-          <div className="footer-tagline">Club de Buceo y Apnea<br/>Lo Prado · RM · Chile</div>
+          <Rich as="div" className="footer-tagline" text={CONTACT.pie.lema}/>
         </div>
         <div className="footer-grid">
           <div className="footer-col">
             <h4>Sobre el club</h4>
-            <p style={{marginBottom: 16}}>Buceo · Apnea · Nado con aletas · Rescatismo · Educación ambiental.</p>
-            <p>Esta web es una experiencia inmersiva. Practica apnea siempre acompañado y bajo supervisión profesional.</p>
+            {CONTACT.pie.sobreElClub.map((t, i, all) => (
+              <Rich key={i} text={t} style={i < all.length - 1 ? {marginBottom: 16} : undefined}/>
+            ))}
           </div>
           <div className="footer-col">
             <h4>Navegación</h4>
-            <a href="#mision">Misión</a>
-            <a href="#historia">Historia</a>
-            <a href="#eventos">Eventos</a>
-            <a href="#contacto">Contacto</a>
+            {NAV.filter(([href]) => FOOTER_NAV.includes(href)).map(([href, label]) => <a key={href} href={href}>{label}</a>)}
           </div>
           <div className="footer-col">
             <h4>Contacto</h4>
-            <a href="https://wa.me/56967508503">+56 9 6750 8503</a>
-            <a href="mailto:hola@kinchika.cl">hola@kinchika.cl</a>
-            <a href="https://www.instagram.com/clubdebuceo.kinchika/">Instagram</a>
+            <a href={waLink()}>{CONTACT.whatsapp}</a>
+            <a href={`mailto:${CONTACT.email}`}>{CONTACT.email}</a>
+            <a href={igLink()}>Instagram</a>
           </div>
           <div className="footer-col">
             <h4>Sede</h4>
-            <p>Piscina Municipal de Lo Prado<br/>Los Copihues 5797<br/>Lo Prado · RM</p>
+            <Rich text={CONTACT.pie.sede}/>
           </div>
         </div>
         {CREDITS.length > 0 && <Credits/>}

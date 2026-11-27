@@ -1,0 +1,13 @@
+{
+  "presentacion": { "visible": true },
+  "mision": { "visible": true, "menu": "Misión", "etiqueta": "Quiénes somos", "titulo": "Nuestra misión" },
+  "historia": { "visible": true, "menu": "Historia", "etiqueta": "Nuestra historia", "titulo": "Kinchika, palabra de mar" },
+  "apnea": { "visible": true, "etiqueta": "Historia del buceo en apnea", "titulo": "Freediving · Buceo libre", "bajada": "Una de las disciplinas más fascinantes y antiguas de la interacción humana con el mar." },
+  "horarios": { "visible": true, "menu": "Horarios", "etiqueta": "Entrenamientos", "titulo": "Horarios", "bajada": "Piscina municipal de Lo Prado · 21:00 a 22:00 hrs. Tres sesiones semanales bajo supervisión profesional." },
+  "eventos": { "visible": true, "menu": "Eventos", "etiqueta": "Calendario", "titulo": "Próximos eventos", "bajada": "Limpiezas de playa, clínicas, salidas grupales y encuentros del club. Inscripciones abiertas y próximas actividades." },
+  "resultados": { "visible": true, "etiqueta": "Marcador oficial", "titulo": "Resultados de eventos", "bajada": "Registro histórico de competencias y encuentros del club Kinchika en colaboración con la federación FEDESUB." },
+  "directiva": { "visible": true, "menu": "Directiva", "etiqueta": "Historia institucional", "titulo": "Directiva del club", "bajada": "Registro permanente de quienes han liderado el Club Kinchika año a año, velando por el crecimiento y la transparencia de nuestra organización.", "bajadaMovil": "Registro histórico de directivas del Club Kinchika." },
+  "lugar": { "visible": true, "etiqueta": "Dónde entrenamos", "titulo": "Nuestro lugar", "bajada": "Piscina municipal de Lo Prado — nuestro centro de entrenamiento." },
+  "contacto": { "visible": true, "menu": "Contacto", "etiqueta": "Contacto", "titulo": "Sumérgete con nosotros", "bajada": "Nuevos integrantes son bienvenidos. Escríbenos o pásate por la piscina un martes, miércoles o jueves." },
+  "aliados": { "visible": true, "etiqueta": "Aliados", "titulo": "Nos apoyan" }
+}

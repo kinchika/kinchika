@@ -1,6 +1,7 @@
 /* Calendario de eventos con filtros */
 import { useEffect, useRef, useState } from 'react';
-import { EVENTS } from '../data/kinchika.js';
+import { EVENTS, SECTIONS, isVisible } from '../lib/content.js';
+import { Rich } from '../components/Rich.jsx';
 
 /**
  * Usa la foto generada (img/eventos/<nombre>.jpg) si existe;
@@ -71,13 +72,15 @@ export function Events() {
   const discOpts = [['ALL','Todas'],['ECO','Eco'],['STA','Estática'],['DYN','Dinámica'],['DEPTH','Profundidad'],['EDU','Charlas']];
   const levelOpts = [['ALL','Todos los niveles'],['Principiante','Principiante'],['Intermedio','Intermedio'],['Competitivo','Competitivo']];
 
+  if (!isVisible('eventos')) return null;
+  const head = SECTIONS.eventos;
   return (
     <section id="eventos" className="section section--wide">
       <div className="container">
         <div className="section__head">
-          <div className="eyebrow">Calendario</div>
-          <h2 className="heading">Próximos eventos</h2>
-          <p className="lead">Limpiezas de playa, clínicas, salidas grupales y encuentros del club. Inscripciones abiertas y próximas actividades.</p>
+          <div className="eyebrow">{head.etiqueta}</div>
+          <h2 className="heading">{head.titulo}</h2>
+          <Rich className="lead" text={head.bajada}/>
         </div>
 
         <div className="filter-bar">
@@ -95,8 +98,8 @@ export function Events() {
         </div>
 
         <div className="events-grid">
-          {filtered.map(e => (
-            <div key={e.id} className="event-card">
+          {filtered.map((e, i) => (
+            <div key={e.fecha + i} className="event-card">
               <div className="event-image">
                 <EventImage src={e.img} alt={e.title}/>
                 <span className="event-disc-tag">{e.discLabel}</span>
@@ -108,7 +111,7 @@ export function Events() {
               <div className="event-body">
                 <h3>{e.title}</h3>
                 <div className="place">◇ {e.place}</div>
-                <div className="desc">{e.desc}</div>
+                <Rich as="div" className="desc" text={e.desc}/>
                 <div className="event-meta">
                   <span className="level">{e.level}</span>
                   <span className={'cupos' + (e.cupos === 0 ? ' full' : '')}>

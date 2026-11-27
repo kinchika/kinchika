@@ -1,0 +1,158 @@
+[
+  {
+    "anio": "2026",
+    "inicio": "Ene 2026",
+    "fin": "Dic 2026",
+    "estado": "Vigente",
+    "cargos": [
+      {
+        "cargo": "Presidente",
+        "name": "Francisco Reyes",
+        "img": "img/directiva/francisco-reyes.svg",
+        "main": true
+      },
+      {
+        "cargo": "Vicepresidenta",
+        "name": "Marcela Torres",
+        "img": "img/directiva/marcela-torres.svg",
+        "main": false
+      },
+      {
+        "cargo": "Tesorero",
+        "name": "Andrés Molina",
+        "img": "img/directiva/andres-molina.svg",
+        "main": false
+      },
+      {
+        "cargo": "Secretaria",
+        "name": "Carla Ibáñez",
+        "img": "img/directiva/carla-ibanez.svg",
+        "main": false
+      },
+      {
+        "cargo": "Director Técnico",
+        "name": "Valentino Molina",
+        "img": "img/directiva/valentino-molina.svg",
+        "main": false
+      },
+      {
+        "cargo": "Director de Eventos",
+        "name": "Tomás Espinoza",
+        "img": "img/directiva/tomas-espinoza.svg",
+        "main": false
+      },
+      {
+        "cargo": "Comunicaciones",
+        "name": "Daniela Soto",
+        "img": "img/directiva/daniela-soto.svg",
+        "main": false
+      },
+      {
+        "cargo": "Director Ecológico",
+        "name": "Rodrigo Castro",
+        "img": "img/directiva/rodrigo-castro.svg",
+        "main": false
+      }
+    ]
+  },
+  {
+    "anio": "2025",
+    "inicio": "Ene 2025",
+    "fin": "Dic 2025",
+    "estado": "Concluido",
+    "cargos": [
+      {
+        "cargo": "Presidenta",
+        "name": "Marcela Torres",
+        "img": "img/directiva/marcela-torres.svg",
+        "main": true
+      },
+      {
+        "cargo": "Vicepresidente",
+        "name": "Francisco Reyes",
+        "img": "img/directiva/francisco-reyes.svg",
+        "main": false
+      },
+      {
+        "cargo": "Tesorera",
+        "name": "Verónica Leal",
+        "img": "img/directiva/veronica-leal.svg",
+        "main": false
+      },
+      {
+        "cargo": "Secretario",
+        "name": "Luis Contreras",
+        "img": "img/directiva/luis-contreras.svg",
+        "main": false
+      },
+      {
+        "cargo": "Director Técnico",
+        "name": "Neymar Colmenares",
+        "img": "img/directiva/neymar-colmenares.svg",
+        "main": false
+      },
+      {
+        "cargo": "Director de Eventos",
+        "name": "Pilar Núñez",
+        "img": "img/directiva/pilar-nunez.svg",
+        "main": false
+      },
+      {
+        "cargo": "Comunicaciones",
+        "name": "Fernanda Opazo",
+        "img": "img/directiva/fernanda-opazo.svg",
+        "main": false
+      },
+      {
+        "cargo": "Directora Ecológica",
+        "name": "Natalia Vargas",
+        "img": "img/directiva/natalia-vargas.svg",
+        "main": false
+      }
+    ]
+  },
+  {
+    "anio": "2024",
+    "inicio": "May 2024",
+    "fin": "Dic 2024",
+    "estado": "Concluido",
+    "cargos": [
+      {
+        "cargo": "Presidente",
+        "name": "Luis Contreras",
+        "img": "img/directiva/luis-contreras.svg",
+        "main": true
+      },
+      {
+        "cargo": "Vicepresidenta",
+        "name": "Verónica Leal",
+        "img": "img/directiva/veronica-leal.svg",
+        "main": false
+      },
+      {
+        "cargo": "Tesorero",
+        "name": "Rodrigo Castro",
+        "img": "img/directiva/rodrigo-castro.svg",
+        "main": false
+      },
+      {
+        "cargo": "Secretaria",
+        "name": "Pilar Núñez",
+        "img": "img/directiva/pilar-nunez.svg",
+        "main": false
+      },
+      {
+        "cargo": "Director Técnico",
+        "name": "Andrés Molina",
+        "img": "img/directiva/andres-molina.svg",
+        "main": false
+      },
+      {
+        "cargo": "Comunicaciones",
+        "name": "Natalia Vargas",
+        "img": "img/directiva/natalia-vargas.svg",
+        "main": false
+      }
+    ]
+  }
+]

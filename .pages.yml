@@ -1,0 +1,457 @@
+# Panel de contenido del sitio www.kinchika.cl (Pages CMS: https://app.pagescms.org)
+#
+# Cada vez que alguien guarda en el panel se hace un commit en main y GitHub Actions
+# publica el sitio de nuevo (tarda unos 2 minutos).
+#
+# Los textos aceptan formato simple: **negrita**, *cursiva* y saltos de línea.
+# Las fotos se guardan en public/img/... y en el contenido quedan como "img/...".
+# Súbelas livianas (idealmente menos de 500 KB, en .jpg o .webp).
+
+media:
+  input: public/img
+  output: img
+  rename: safe
+  extensions: [jpg, jpeg, png, webp, svg, gif]
+
+settings:
+  commit:
+    templates:
+      create: "Panel: crea {path}"
+      update: "Panel: actualiza {name} ({path})"
+      delete: "Panel: elimina {path}"
+      rename: "Panel: renombra {oldPath} a {newPath}"
+
+content:
+  # ───────────────────────── Listas ─────────────────────────
+  - name: eventos
+    label: Eventos
+    type: file
+    path: src/content/eventos.json
+    format: json
+    list: true
+    operations: { delete: false }
+    fields:
+      - name: title
+        label: Título
+        type: string
+        required: true
+      - name: fecha
+        label: Fecha
+        type: date
+        required: true
+        description: Los eventos se ordenan solos por fecha.
+        options:
+          format: yyyy-MM-dd
+      - name: disc
+        label: Tipo de actividad
+        type: select
+        required: true
+        options:
+          values:
+            - { name: ECO, label: "Eco (limpiezas, reforestación)" }
+            - { name: STA, label: "Estática" }
+            - { name: DYN, label: "Dinámica" }
+            - { name: DEPTH, label: "Profundidad" }
+            - { name: EDU, label: "Charla" }
+      - name: place
+        label: Lugar
+        type: string
+        description: "Ejemplo: Quintay · V Región"
+      - name: desc
+        label: Descripción
+        type: text
+      - name: level
+        label: Nivel
+        type: select
+        options:
+          values: [Principiante, Intermedio, Competitivo]
+      - name: cupos
+        label: Cupos disponibles
+        type: number
+        description: Si es 0, el evento aparece como "Sin cupos".
+        options: { min: 0 }
+      - name: cuposMax
+        label: Cupos totales
+        type: number
+        options: { min: 0 }
+      - name: img
+        label: Imagen
+        type: image
+        options:
+          path: public/img/eventos
+      - name: visible
+        label: Mostrar en el sitio
+        type: boolean
+        default: true
+
+  - name: resultados
+    label: Resultados
+    type: file
+    path: src/content/resultados.json
+    format: json
+    list: true
+    operations: { delete: false }
+    fields:
+      - name: name
+        label: Competencia
+        type: string
+        required: true
+        description: La primera de la lista es la que se muestra al abrir la sección.
+      - name: date
+        label: Fecha (texto)
+        type: string
+        description: "Ejemplo: Septiembre 2025"
+      - name: location
+        label: Sede
+        type: string
+      - name: discipline
+        label: Disciplina
+        type: string
+        description: "Ejemplo: STA · Estática"
+      - name: rows
+        label: Posiciones
+        type: object
+        list:
+          collapsible:
+            collapsed: true
+            summary: "{pos}. {name} — {perf}"
+        fields:
+          - name: pos
+            label: Posición
+            type: number
+            options: { min: 1 }
+          - name: name
+            label: Nombre
+            type: string
+          - name: club
+            label: Club
+            type: string
+          - name: perf
+            label: Marca
+            type: string
+            description: "Ejemplo: 5:42 o 128m"
+          - name: record
+            label: Récord
+            type: string
+            description: "RC = récord del club, RN = récord nacional. Dejar vacío si no aplica."
+
+  - name: directivas
+    label: Directiva
+    type: file
+    path: src/content/directivas.json
+    format: json
+    list: true
+    operations: { delete: false }
+    fields:
+      - name: anio
+        label: Año
+        type: string
+        required: true
+        description: Los años se ordenan solos, del más reciente al más antiguo.
+      - name: inicio
+        label: Inicio del período
+        type: string
+        description: "Ejemplo: Ene 2026"
+      - name: fin
+        label: Fin del período
+        type: string
+        description: "Ejemplo: Dic 2026"
+      - name: estado
+        label: Estado
+        type: select
+        options:
+          values: [Vigente, Concluido]
+      - name: cargos
+        label: Cargos
+        type: object
+        list:
+          collapsible:
+            collapsed: true
+            summary: "{cargo}: {name}"
+        fields:
+          - name: cargo
+            label: Cargo
+            type: string
+          - name: name
+            label: Nombre
+            type: string
+          - name: img
+            label: Foto
+            type: image
+            options:
+              path: public/img/directiva
+          - name: main
+            label: Destacar (presidencia)
+            type: boolean
+            default: false
+
+  - name: horarios
+    label: Horarios
+    type: file
+    path: src/content/horarios.json
+    format: json
+    list: true
+    operations: { delete: false }
+    fields:
+      - name: day
+        label: Día
+        type: string
+        required: true
+      - name: tag
+        label: Etiqueta
+        type: string
+        description: "Ejemplo: Día 01"
+      - name: title
+        label: Actividad
+        type: string
+      - name: hour
+        label: Horario
+        type: string
+        description: "Ejemplo: 21:00 — 22:00"
+      - name: desc
+        label: Descripción
+        type: text
+
+  - name: historia-apnea
+    label: Historia del apnea (línea de tiempo)
+    type: file
+    path: src/content/historia-apnea.json
+    format: json
+    list: true
+    operations: { delete: false }
+    fields:
+      - name: era
+        label: Época
+        type: string
+        description: "Ejemplo: S. VIII a.C. o 1990"
+      - name: icon
+        label: Ícono (emoji)
+        type: string
+      - name: title
+        label: Título
+        type: string
+        required: true
+      - name: img
+        label: Imagen
+        type: image
+        options:
+          path: public/img/timeline
+      - name: text
+        label: Texto (computador)
+        type: text
+        description: "Formato: **negrita** y *cursiva*."
+      - name: textMobile
+        label: Texto corto (celular)
+        type: text
+
+  - name: aliados
+    label: Aliados
+    type: file
+    path: src/content/aliados.json
+    format: json
+    list: true
+    operations: { delete: false }
+    fields:
+      - name: name
+        label: Nombre
+        type: string
+        required: true
+      - name: url
+        label: Enlace
+        type: string
+        description: Dirección web completa, con https://
+      - name: logo
+        label: Logo
+        type: image
+        description: Idealmente PNG blanco con fondo transparente.
+        options:
+          path: public/img/logos
+
+  # ───────────────────────── Textos del sitio ─────────────────────────
+  - name: textos
+    label: Textos del sitio
+    type: group
+    items:
+      - name: inicio
+        label: Portada, misión e historia
+        type: file
+        path: src/content/inicio.json
+        format: json
+        operations: { delete: false }
+        fields:
+          - name: portada
+            label: Portada
+            type: object
+            fields:
+              - { name: etiqueta, label: Texto sobre el título, type: string }
+              - { name: subtitulo, label: Subtítulo, type: text }
+              - { name: botonPrincipal, label: Botón principal, type: string }
+              - { name: botonSecundario, label: Botón secundario, type: string }
+          - name: presentacion
+            label: Presentación
+            type: object
+            fields:
+              - { name: titulo, label: Título, type: text, description: "Cada línea se muestra en una línea aparte." }
+              - { name: texto, label: Texto (computador), type: text }
+              - { name: textoMovil, label: Texto corto (celular), type: text }
+          - name: mision
+            label: Misión
+            type: object
+            fields:
+              - { name: texto, label: Texto (computador), type: text }
+              - { name: textoMovil, label: Texto corto (celular), type: text }
+              - { name: disciplinas, label: Disciplinas, type: string, list: true }
+          - name: historia
+            label: Historia del club
+            type: object
+            fields:
+              - { name: destacado, label: Párrafo destacado (computador), type: text, description: "Formato: **negrita** y *cursiva*." }
+              - { name: texto, label: Segundo párrafo (computador), type: text }
+              - { name: textoMovil, label: Resumen (celular), type: text }
+              - { name: cierre, label: Párrafo final (siempre visible), type: text }
+              - { name: tituloProfesores, label: Título de profesores, type: string }
+              - name: profesores
+                label: Profesores
+                type: object
+                list:
+                  collapsible:
+                    collapsed: true
+                    summary: "{name}"
+                fields:
+                  - { name: name, label: Nombre, type: string }
+                  - { name: role, label: Especialidad, type: string }
+                  - name: img
+                    label: Foto
+                    type: image
+                    options:
+                      path: public/img/historia
+
+      - name: contacto
+        label: Contacto, lugar y pie de página
+        type: file
+        path: src/content/contacto.json
+        format: json
+        operations: { delete: false }
+        fields:
+          - { name: whatsapp, label: WhatsApp, type: string, description: "Con código de país. Ejemplo: +56 9 6750 8503" }
+          - { name: whatsappNombre, label: Quién responde el WhatsApp, type: string }
+          - { name: email, label: Correo, type: string }
+          - { name: instagramUsuario, label: Usuario de Instagram, type: string, description: "Sin @. Ejemplo: clubdebuceo.kinchika" }
+          - { name: instagramTexto, label: Texto bajo Instagram, type: string }
+          - name: lugar
+            label: Lugar de entrenamiento
+            type: object
+            fields:
+              - { name: nombre, label: Nombre, type: string }
+              - { name: direccion, label: Dirección, type: string }
+              - { name: comuna, label: Comuna, type: string }
+              - { name: region, label: Región, type: string }
+              - { name: pais, label: País, type: string }
+              - { name: texto, label: Texto (computador), type: text }
+              - { name: textoMovil, label: Texto corto (celular), type: text }
+              - { name: mapsUrl, label: Enlace "Ver en Google Maps", type: string }
+              - { name: mapaEmbedUrl, label: Mapa incrustado (URL), type: string, description: "En Google Maps: Compartir → Insertar un mapa → copiar solo la dirección que está dentro de src=\"...\"" }
+          - name: pie
+            label: Pie de página
+            type: object
+            fields:
+              - { name: lema, label: Lema, type: text }
+              - { name: sobreElClub, label: Sobre el club (párrafos), type: text, list: true }
+              - { name: sede, label: Sede, type: text }
+
+      - name: secciones
+        label: Secciones (mostrar/ocultar y títulos)
+        type: file
+        path: src/content/secciones.json
+        format: json
+        operations: { delete: false }
+        fields:
+          - name: presentacion
+            label: Presentación
+            type: object
+            fields:
+              - { name: visible, label: Mostrar, type: boolean, default: true }
+          - name: mision
+            label: Misión
+            type: object
+            fields:
+              - { name: visible, label: Mostrar, type: boolean, default: true }
+              - { name: menu, label: Nombre en el menú, type: string }
+              - { name: etiqueta, label: Texto sobre el título, type: string }
+              - { name: titulo, label: Título, type: string }
+          - name: historia
+            label: Historia del club
+            type: object
+            fields:
+              - { name: visible, label: Mostrar, type: boolean, default: true }
+              - { name: menu, label: Nombre en el menú, type: string }
+              - { name: etiqueta, label: Texto sobre el título, type: string }
+              - { name: titulo, label: Título, type: string }
+          - name: apnea
+            label: Historia del apnea
+            type: object
+            fields:
+              - { name: visible, label: Mostrar, type: boolean, default: true }
+              - { name: etiqueta, label: Texto sobre el título, type: string }
+              - { name: titulo, label: Título, type: string }
+              - { name: bajada, label: Bajada, type: text }
+          - name: horarios
+            label: Horarios
+            type: object
+            fields:
+              - { name: visible, label: Mostrar, type: boolean, default: true }
+              - { name: menu, label: Nombre en el menú, type: string }
+              - { name: etiqueta, label: Texto sobre el título, type: string }
+              - { name: titulo, label: Título, type: string }
+              - { name: bajada, label: Bajada, type: text }
+          - name: eventos
+            label: Eventos
+            type: object
+            fields:
+              - { name: visible, label: Mostrar, type: boolean, default: true }
+              - { name: menu, label: Nombre en el menú, type: string }
+              - { name: etiqueta, label: Texto sobre el título, type: string }
+              - { name: titulo, label: Título, type: string }
+              - { name: bajada, label: Bajada, type: text }
+          - name: resultados
+            label: Resultados
+            type: object
+            fields:
+              - { name: visible, label: Mostrar, type: boolean, default: true }
+              - { name: etiqueta, label: Texto sobre el título, type: string }
+              - { name: titulo, label: Título, type: string }
+              - { name: bajada, label: Bajada, type: text }
+          - name: directiva
+            label: Directiva
+            type: object
+            fields:
+              - { name: visible, label: Mostrar, type: boolean, default: true }
+              - { name: menu, label: Nombre en el menú, type: string }
+              - { name: etiqueta, label: Texto sobre el título, type: string }
+              - { name: titulo, label: Título, type: string }
+              - { name: bajada, label: Bajada (computador), type: text }
+              - { name: bajadaMovil, label: Bajada corta (celular), type: text }
+          - name: lugar
+            label: Nuestro lugar
+            type: object
+            fields:
+              - { name: visible, label: Mostrar, type: boolean, default: true }
+              - { name: etiqueta, label: Texto sobre el título, type: string }
+              - { name: titulo, label: Título, type: string }
+              - { name: bajada, label: Bajada, type: text }
+          - name: contacto
+            label: Contacto
+            type: object
+            fields:
+              - { name: visible, label: Mostrar, type: boolean, default: true }
+              - { name: menu, label: Nombre en el menú, type: string }
+              - { name: etiqueta, label: Texto sobre el título, type: string }
+              - { name: titulo, label: Título, type: string }
+              - { name: bajada, label: Bajada, type: text }
+          - name: aliados
+            label: Aliados (franja del pie)
+            type: object
+            fields:
+              - { name: visible, label: Mostrar, type: boolean, default: true }
+              - { name: etiqueta, label: Texto sobre el título, type: string }
+              - { name: titulo, label: Título, type: string }

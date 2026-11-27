@@ -1,0 +1,26 @@
+{
+  "whatsapp": "+56 9 6750 8503",
+  "whatsappNombre": "Francisco Reyes · Presidente",
+  "email": "hola@kinchika.cl",
+  "instagramUsuario": "clubdebuceo.kinchika",
+  "instagramTexto": "Síguenos para novedades",
+  "lugar": {
+    "nombre": "Piscina Municipal de Lo Prado",
+    "direccion": "Los Copihues 5797",
+    "comuna": "Lo Prado",
+    "region": "Región Metropolitana",
+    "pais": "Chile",
+    "texto": "Espacio que hemos transformado en nuestro centro de entrenamiento gracias al apoyo de la municipalidad. Aquí desarrollamos las sesiones de nado, acondicionamiento y técnica de apnea.",
+    "textoMovil": "Nuestro centro de entrenamiento para nado, acondicionamiento y técnica de apnea.",
+    "mapsUrl": "https://maps.google.com/?q=Los+Copihues+5797,+Lo+Prado",
+    "mapaEmbedUrl": "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3329.2921497651396!2d-70.72124791200032!3d-33.44169432844727!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x9662c476226cdf89%3A0x35845e136ef8434c!2sLos%20Copihues%205797%2C%20Lo%20Prado%2C%20Regi%C3%B3n%20Metropolitana!5e0!3m2!1ses-419!2scl!4v1778029852080!5m2!1ses-419!2scl"
+  },
+  "pie": {
+    "lema": "Club de Buceo y Apnea\nLo Prado · RM · Chile",
+    "sobreElClub": [
+      "Buceo · Apnea · Nado con aletas · Rescatismo · Educación ambiental.",
+      "Esta web es una experiencia inmersiva. Practica apnea siempre acompañado y bajo supervisión profesional."
+    ],
+    "sede": "Piscina Municipal de Lo Prado\nLos Copihues 5797\nLo Prado · RM"
+  }
+}

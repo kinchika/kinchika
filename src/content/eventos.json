@@ -1,0 +1,74 @@
+[
+  {
+    "title": "Limpieza de playa Quintay",
+    "fecha": "2026-05-18",
+    "disc": "ECO",
+    "place": "Quintay · V Región",
+    "desc": "Jornada de recolección de residuos costeros junto a la junta de vecinos local.",
+    "level": "Principiante",
+    "cupos": 12,
+    "cuposMax": 25,
+    "img": "img/eventos/limpieza-playa.svg",
+    "visible": true
+  },
+  {
+    "title": "Clínica de apnea estática",
+    "fecha": "2026-05-24",
+    "disc": "STA",
+    "place": "Piscina Lo Prado",
+    "desc": "Sesión técnica con énfasis en relajación, contracciones y manejo de la respuesta diafragmática.",
+    "level": "Intermedio",
+    "cupos": 4,
+    "cuposMax": 12,
+    "img": "img/eventos/clinica-apnea.svg",
+    "visible": true
+  },
+  {
+    "title": "Salida a Pichilemu",
+    "fecha": "2026-06-07",
+    "disc": "DEPTH",
+    "place": "Pichilemu · VI Región",
+    "desc": "Inmersión grupal en boya. Profundidades de 12 a 25m con seguidor por cuerda.",
+    "level": "Competitivo",
+    "cupos": 0,
+    "cuposMax": 8,
+    "img": "img/eventos/salida-pichilemu.svg",
+    "visible": true
+  },
+  {
+    "title": "Historia del freediving",
+    "fecha": "2026-06-14",
+    "disc": "EDU",
+    "place": "Centro Cultural Lo Prado",
+    "desc": "Charla abierta sobre las raíces culturales del buceo en apnea, de Kálimnos a Molchanova.",
+    "level": "Principiante",
+    "cupos": 28,
+    "cuposMax": 60,
+    "img": "img/eventos/charla-historia.svg",
+    "visible": true
+  },
+  {
+    "title": "Interclubes nado con aletas",
+    "fecha": "2026-06-21",
+    "disc": "DYN",
+    "place": "Estadio Nacional",
+    "desc": "Encuentro DYN/DNF con clubes hermanos. Modalidades 50m y 100m.",
+    "level": "Competitivo",
+    "cupos": 6,
+    "cuposMax": 16,
+    "img": "img/eventos/interclubes-nado.svg",
+    "visible": true
+  },
+  {
+    "title": "Reforestación dunas Algarrobo",
+    "fecha": "2026-07-05",
+    "disc": "ECO",
+    "place": "Algarrobo · V Región",
+    "desc": "Plantación de especies nativas de duna en colaboración con CONAF.",
+    "level": "Principiante",
+    "cupos": 18,
+    "cuposMax": 40,
+    "img": "img/eventos/limpieza-playa.svg",
+    "visible": true
+  }
+]

@@ -1,0 +1,23 @@
+[
+  {
+    "day": "Martes",
+    "tag": "Día 01",
+    "title": "Nado y acondicionamiento",
+    "hour": "21:00 — 22:00",
+    "desc": "Entrenamiento guiado por profesores, centrado en el desarrollo de la natación y capacidades aeróbicas."
+  },
+  {
+    "day": "Miércoles",
+    "tag": "Día 02",
+    "title": "Nado libre",
+    "hour": "21:00 — 22:00",
+    "desc": "Cada persona coordina su propio plan de trabajo, promoviendo la crítica constructiva entre compañeros."
+  },
+  {
+    "day": "Jueves",
+    "tag": "Día 03",
+    "title": "Apnea técnica",
+    "hour": "21:00 — 22:00",
+    "desc": "Sesión técnica de apnea bajo la supervisión y dirección de nuestros profesores especializados."
+  }
+]

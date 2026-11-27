@@ -1,0 +1,38 @@
+{
+  "portada": {
+    "etiqueta": "Establecido en 2023 · Lo Prado",
+    "subtitulo": "Club de buceo y apnea sin fines de lucro de Lo Prado, dedicados a la formación de deportistas y la protección de nuestro ecosistema marino.",
+    "botonPrincipal": "Explorar disciplinas",
+    "botonSecundario": "Unirse al club"
+  },
+  "presentacion": {
+    "titulo": "Club de Buceo\nKinchika",
+    "texto": "Somos un club de buceo compuesto por vecinos de la comuna de Lo Prado. Funcionamos sin fines de lucro, comprometidos profundamente con la ecología marina, la cultura submarina y el desarrollo del deporte local.",
+    "textoMovil": "Club sin fines de lucro de Lo Prado, comprometido con la ecología marina y el deporte subacuático."
+  },
+  "mision": {
+    "texto": "Fomentar el desarrollo integral de la comunidad a través de la práctica de deportes subacuáticos y la educación ambiental. Como organización sin fines de lucro, nos dedicamos a la preservación del patrimonio marino y el rescate de la cultura submarina, promoviendo la equidad social y el acceso inclusivo al deporte bajo un modelo de gestión transparente y colaborativo.",
+    "textoMovil": "Fomentar la comunidad a través del deporte subacuático y la educación ambiental, con acceso inclusivo y transparencia.",
+    "disciplinas": [
+      "Buceo",
+      "Apnea",
+      "Nado con aletas",
+      "Rugby subacuático",
+      "Rescatismo",
+      "Limpieza de playas",
+      "Educación medioambiental",
+      "Sensibilización marina"
+    ]
+  },
+  "historia": {
+    "destacado": "Somos un grupo de vecinos, pobladores de **Barrancas**, que movidos por la pasión por el mar nos hemos consolidado como un club deportivo, social y cultural dedicado a las actividades subacuáticas. Aunque nuestra identidad está arraigada en una zona interior, mantenemos un vínculo vital con el océano a través de campañas ecológicas de limpieza y el apoyo constante a proyectos de cultura marina.",
+    "texto": "Nuestra historia dio un paso decisivo con la apertura de la **piscina municipal de Lo Prado**, espacio que hemos transformado en nuestro centro de entrenamiento. Hemos hecho fuerza con compras al por mayor para adquirir equipamiento especializado y buscando convenios para la obtención de licencias de buceo inicial. Así también nos adjudicamos nuestra propia **boya grupal para prácticas de profundidad**.",
+    "textoMovil": "Vecinos de **Barrancas** unidos por el mar. Entrenamos en la **piscina de Lo Prado** con equipamiento propio y boya grupal para profundidad.",
+    "cierre": "Somos una comunidad que derriba distancias geográficas para sumergirse en el deporte y el cuidado del medio ambiente marino.",
+    "tituloProfesores": "Nuestros profesores",
+    "profesores": [
+      { "name": "Neymar Colmenares", "role": "Perfeccionamiento de nado", "img": "img/historia/neymar.svg" },
+      { "name": "Valentino Molina", "role": "Apnea y nado con aletas", "img": "img/historia/valentino.svg" }
+    ]
+  }
+}

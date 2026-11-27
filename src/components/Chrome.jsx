@@ -1,5 +1,6 @@
 /* Elementos fijos de la interfaz: overlay de audio, navegación, computador de buceo, sonido y barra de profundidad */
 import { useEffect, useRef, useState } from 'react';
+import { NAV } from '../lib/content.js';
 import { IconHeadphones } from './Icons.jsx';
 import { depthState, MAX_DEPTH_M, useDepth, useScrollY } from '../lib/depth.js';
 import { isPlaying, onAudioChange, startAudio, toggleAudio } from '../lib/audio.js';
@@ -33,10 +34,6 @@ export function AudioOverlay({ onContinue }) {
   );
 }
 
-const NAV = [
-  ['#mision', 'Misión'], ['#historia', 'Historia'], ['#horarios', 'Horarios'],
-  ['#eventos', 'Eventos'], ['#directiva', 'Directiva'], ['#contacto', 'Contacto'],
-];
 
 export function TopNav() {
   const scrolled = useScrollY(80);

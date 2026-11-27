@@ -1,7 +1,8 @@
 /* Horarios y simuladores de tablas de apnea (O₂ / CO₂) */
 import { useEffect, useMemo, useState } from 'react';
 import { createPortal } from 'react-dom';
-import { SCHEDULE } from '../data/kinchika.js';
+import { SCHEDULE, SECTIONS, isVisible } from '../lib/content.js';
+import { Rich } from '../components/Rich.jsx';
 import { useIsMobile } from '../lib/useIsMobile.js';
 
 // === SIMULATOR HELPERS ===
@@ -179,17 +180,19 @@ export function Schedule() {
     return () => window.removeEventListener('keydown', onKey);
   }, [activeSim]);
 
+  if (!isVisible('horarios')) return null;
+  const head = SECTIONS.horarios;
   return (
     <section id="horarios" className="section section--wide">
       <div className="container">
         <div className="section__head">
-          <div className="eyebrow">Entrenamientos</div>
-          <h2 className="heading">Horarios</h2>
-          <p className="lead">Piscina municipal de Lo Prado · 21:00 a 22:00 hrs. Tres sesiones semanales bajo supervisión profesional.</p>
+          <div className="eyebrow">{head.etiqueta}</div>
+          <h2 className="heading">{head.titulo}</h2>
+          <Rich className="lead" text={head.bajada}/>
         </div>
         <div className="schedule-grid">
-          {SCHEDULE.map(s => (
-            <div key={s.day} className="schedule-card">
+          {SCHEDULE.map((s, i) => (
+            <div key={i} className="schedule-card">
               <div className="card-tag">{s.tag}</div>
               <div className="day">{s.day}</div>
               <div className="hour">{s.hour}</div>
